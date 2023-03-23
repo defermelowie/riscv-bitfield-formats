@@ -7,100 +7,100 @@ pub trait Bits {
 }
 
 #[derive(Bits)]
-pub struct B1(#[size(1)] pub u32);
+pub struct B1(#[size(1)] pub u64);
 
 #[derive(Bits)]
-pub struct B2(#[size(2)] pub u32);
+pub struct B2(#[size(2)] pub u64);
 
 #[derive(Bits)]
-pub struct B3(#[size(3)] pub u32);
+pub struct B3(#[size(3)] pub u64);
 
 #[derive(Bits)]
-pub struct B4(#[size(4)] pub u32);
+pub struct B4(#[size(4)] pub u64);
 
 #[derive(Bits)]
-pub struct B5(#[size(5)] pub u32);
+pub struct B5(#[size(5)] pub u64);
 
 #[derive(Bits)]
-pub struct B6(#[size(6)] pub u32);
+pub struct B6(#[size(6)] pub u64);
 
 #[derive(Bits)]
-pub struct B7(#[size(7)] pub u32);
+pub struct B7(#[size(7)] pub u64);
 
 #[derive(Bits)]
-pub struct B8(#[size(8)] pub u32);
+pub struct B8(#[size(8)] pub u64);
 
 #[derive(Bits)]
-pub struct B9(#[size(9)] pub u32);
+pub struct B9(#[size(9)] pub u64);
 
 #[derive(Bits)]
-pub struct B10(#[size(10)] pub u32);
+pub struct B10(#[size(10)] pub u64);
 
 #[derive(Bits)]
-pub struct B11(#[size(11)] pub u32);
+pub struct B11(#[size(11)] pub u64);
 
 #[derive(Bits)]
-pub struct B12(#[size(12)] pub u32);
+pub struct B12(#[size(12)] pub u64);
 
 #[derive(Bits)]
-pub struct B13(#[size(13)] pub u32);
+pub struct B13(#[size(13)] pub u64);
 
 #[derive(Bits)]
-pub struct B14(#[size(14)] pub u32);
+pub struct B14(#[size(14)] pub u64);
 
 #[derive(Bits)]
-pub struct B15(#[size(15)] pub u32);
+pub struct B15(#[size(15)] pub u64);
 
 #[derive(Bits)]
-pub struct B16(#[size(16)] pub u32);
+pub struct B16(#[size(16)] pub u64);
 
 #[derive(Bits)]
-pub struct B17(#[size(17)] pub u32);
+pub struct B17(#[size(17)] pub u64);
 
 #[derive(Bits)]
-pub struct B18(#[size(18)] pub u32);
+pub struct B18(#[size(18)] pub u64);
 
 #[derive(Bits)]
-pub struct B19(#[size(19)] pub u32);
+pub struct B19(#[size(19)] pub u64);
 
 #[derive(Bits)]
-pub struct B20(#[size(20)] pub u32);
+pub struct B20(#[size(20)] pub u64);
 
 #[derive(Bits)]
-pub struct B21(#[size(21)] pub u32);
+pub struct B21(#[size(21)] pub u64);
 
 #[derive(Bits)]
-pub struct B22(#[size(22)] pub u32);
+pub struct B22(#[size(22)] pub u64);
 
 #[derive(Bits)]
-pub struct B23(#[size(23)] pub u32);
+pub struct B23(#[size(23)] pub u64);
 
 #[derive(Bits)]
-pub struct B24(#[size(24)] pub u32);
+pub struct B24(#[size(24)] pub u64);
 
 #[derive(Bits)]
-pub struct B25(#[size(25)] pub u32);
+pub struct B25(#[size(25)] pub u64);
 
 #[derive(Bits)]
-pub struct B26(#[size(26)] pub u32);
+pub struct B26(#[size(26)] pub u64);
 
 #[derive(Bits)]
-pub struct B27(#[size(27)] pub u32);
+pub struct B27(#[size(27)] pub u64);
 
 #[derive(Bits)]
-pub struct B28(#[size(28)] pub u32);
+pub struct B28(#[size(28)] pub u64);
 
 #[derive(Bits)]
-pub struct B29(#[size(29)] pub u32);
+pub struct B29(#[size(29)] pub u64);
 
 #[derive(Bits)]
-pub struct B30(#[size(30)] pub u32);
+pub struct B30(#[size(30)] pub u64);
 
 #[derive(Bits)]
-pub struct B31(#[size(31)] pub u32);
+pub struct B31(#[size(31)] pub u64);
 
 #[derive(Bits)]
-pub struct B32(#[size(32)] pub u32);
+pub struct B32(#[size(32)] pub u64);
 
 #[derive(Bits)]
 pub struct B33(#[size(33)] pub u64);
