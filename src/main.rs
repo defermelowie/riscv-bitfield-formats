@@ -2,7 +2,9 @@ use clap::{Parser, Subcommand};
 use clap_num::maybe_hex;
 
 mod csr;
+
 mod print;
+use print::{PrintError, TColor};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -31,7 +33,11 @@ fn main() {
 
     match cli.command {
         Commands::Print{name, value} => {
-            print::print_csr(&name, value);
+            let print_res = print::print_csr(&name, value);
+            match print_res {
+                Ok(_) => (),
+                Err(PrintError::UnkownCsr(csr)) => eprintln!("{}ERROR: \"{}\" is not a legal CSR name{}", TColor::RS, csr, TColor::N),
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ where
 {
     let lastbit = size_of::<I>() * 8 - 1;
     assert!(lastbit >= end);
-    assert!(lastbit >= start);
+    assert!(end >= start);
 
     let value = value << (lastbit - end);
     let value = value >> (lastbit - end + start);

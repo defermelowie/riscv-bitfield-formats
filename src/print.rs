@@ -1,44 +1,83 @@
 use crate::csr::{self, Csr};
 
-pub fn print_csr(name: &str, value: u64) {
+pub fn print_csr(name: &str, value: u64) -> Result<(), PrintError> {
     let csr: Box<dyn Csr> = match name {
-        // base
-        "misa"    => Box::new(csr::base::Misa::new(value)),
-        // hypervisor extension
+        // Unprivileged floating-point
+        "fflags" => todo!(),
+        "frm" => todo!(),
+        "fcsr" => todo!(),
+        // Unprivileged counters/timers
+        "cycle" => todo!(),
+        "time" => todo!(),
+        "instret" => todo!(),
+        "hmpcounter" => todo!(),
+        // Supervisor trap setup
+        "sstatus" => todo!(),
+        "sie" => todo!(),
+        "stvec" => todo!(),
+        "scounteren" => todo!(),
+        // Supervisor config
+        "senvcfg" => todo!(),
+        // Supervisor trap handling
+        "sscratch" => todo!(),
+        "sepc" => todo!(),
+        "scause" => todo!(),
+        "stval" => todo!(),
+        "sip" => todo!(),
+
+        // Machine config
+        "misa" => Box::new(csr::base::Misa::new(value)),
+        "mvendorid" => Box::new(csr::base::Mvendorid::new(value)),
+        "marchid" => Box::new(csr::base::Marchid::new(value)),
+        "mimpid" => Box::new(csr::base::Mimpid::new(value)),
+        "mhartid" => Box::new(csr::base::Mhartid::new(value)),
+        "mstatus" => Box::new(csr::base::Mstatus::new(value)),
+        // hypervisor
         "hstatus" => Box::new(csr::h_ext::Hstatus::new(value)),
         "hedeleg" => Box::new(csr::h_ext::Hedeleg::new(value)),
         "hideleg" => Box::new(csr::h_ext::Hideleg::new(value)),
-        _ => panic!("{}\"{}\" is not a known CSR{}", TCLR.rs, name, TCLR.n),
+        // unkown
+        _ => return Err(PrintError::UnkownCsr(name.into())),
     };
     csr.print();
+    Ok(())
 }
 
-struct TColor {
+pub enum PrintError {
+    UnkownCsr(String),
+}
+
+pub enum TColor {
     /// Red
-    r: &'static str,
+    R,
     /// Blue
-    b: &'static str,
+    B,
     /// Green
-    g: &'static str,
+    G,
     /// Strong
-    s: &'static str,
+    S,
     /// Normal
-    n: &'static str,
+    N,
     /// Red-strong
-    rs: &'static str,
+    RS,
     /// Blue-strong
-    bs: &'static str,
+    BS,
     /// Green-strong
-    gs: &'static str,
+    GS,
 }
 
-const TCLR: TColor = TColor {
-    r: "\x1b[31m",
-    b: "\x1b[36m",
-    g: "\x1b[32m",
-    s: "\x1b[1m",
-    n: "\x1b[0m",
-    rs: "\x1b[31m\x1b[1m",
-    bs: "\x1b[36m\x1b[1m",
-    gs: "\x1b[32m\x1b[1m",
-};
+impl std::fmt::Display for TColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let color_str = match &self {
+            TColor::R => "\x1b[31m",
+            TColor::B => "\x1b[36m",
+            TColor::G => "\x1b[32m",
+            TColor::S => "\x1b[1m",
+            TColor::N => "\x1b[0m",
+            TColor::RS => "\x1b[31m\x1b[1m",
+            TColor::BS => "\x1b[36m\x1b[1m",
+            TColor::GS => "\x1b[32m\x1b[1m",
+        };
+        write!(f, "{}", color_str)
+    }
+}
