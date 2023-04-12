@@ -1,22 +1,9 @@
 use std::mem::size_of;
 
+use thiserror::Error;
+
 pub mod base;
 pub mod h_ext;
-
-pub trait Csr {
-    /// Create a new CSR instance from a value
-    fn new(value: u64) -> Self
-    where
-        Self: Sized;
-
-    /// Print CSR's value
-    fn print(&self);
-}
-
-pub enum CsrError {
-    UnkownCsr(String),
-    UnsupportedCsr(String),
-}
 
 /// Get a csr from a name/address and value
 pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
@@ -111,6 +98,27 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         // Unkown CSR
         _ => Err(CsrError::UnkownCsr(name.into())),
     }
+}
+
+pub trait Csr {
+    /// Create a new CSR instance from a value
+    fn new(value: u64) -> Self
+    where
+        Self: Sized;
+
+    /// Print CSR's value
+    fn print(&self);
+
+    /// Get info about a CSR
+    fn info(&self) -> String;
+}
+
+#[derive(Error, Debug)]
+pub enum CsrError {
+    #[error("\x1b[31m\x1b[1mERROR: \"{0}\" is not a legal CSR name\x1b[0m")]
+    UnkownCsr(String),
+    #[error("\x1b[33m\x1b[1mWARNING: \"{0}\" is not (yet) supported\x1b[0m")]
+    UnsupportedCsr(String),
 }
 
 pub fn get_bit<I>(value: I, index: usize) -> I
