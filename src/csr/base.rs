@@ -1,6 +1,6 @@
 //! CSR definitions for the base ISA spec
 
-use bits::{Bits, B1, B2, B25, B64, B7};
+use bits::{Bits, B1, B16, B2, B25, B4, B44, B64, B7};
 
 use super::{get_bit, get_bits, Csr};
 
@@ -270,6 +270,34 @@ impl Csr for Mstatus {
 }
 
 /**************************************************************/
+/* Supervisor Address Translation and Protection Register     */
+
+pub struct Satp {
+    mode: B4,
+    asid: B16,
+    ppn: B44,
+}
+
+impl Csr for Satp {
+    fn new(value: u64) -> Self {
+        Satp {
+            mode: B4(get_bits(value, 60, 63)),
+            asid: B16(get_bits(value, 44, 59)),
+            ppn: B44(get_bits(value, 0, 43)),
+        }
+    }
+
+    fn print(&self) {
+        println!("");
+        println!("satp");
+        println!("----");
+        println!("MODE: {}", dec_at_mode(self.mode.to_u64()));
+        println!("ASID: 0x{:x}", &self.asid.to_u64());
+        println!("PPN: 0x{:x}", &self.ppn.to_u64());
+    }
+}
+
+/**************************************************************/
 /* Helper functions                                           */
 
 /// Decode architecture
@@ -289,5 +317,17 @@ pub fn dec_priv(privilege: u64) -> String {
         0b01 => "Supervisor".into(),
         0b11 => "Machine".into(),
         n => format!("Invalid privilege encoding (0b{:b})", n),
+    }
+}
+
+/// Decode address translation mode
+pub fn dec_at_mode(mode: u64) -> String {
+    match mode {
+        0x0 => "Bare".into(),
+        0x1 => "Sv32".into(),
+        0x8 => "Sv39".into(),
+        0x9 => "Sv48".into(),
+        0xa => "Sv57".into(),
+        n => format!("Invalid encoding (0b{:b})", n),
     }
 }
