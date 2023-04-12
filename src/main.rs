@@ -1,10 +1,10 @@
+use std::process::exit;
+
 use clap::{Parser, Subcommand};
 use clap_num::maybe_hex;
 
 mod csr;
-
-mod print;
-use print::{PrintError, TColor};
+use csr::{to_csr, CsrError};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -27,16 +27,31 @@ enum Commands {
     },
 }
 
-
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Print{name, value} => {
-            let print_res = print::print_csr(&name, value);
-            match print_res {
-                Ok(_) => (),
-                Err(PrintError::UnkownCsr(csr)) => eprintln!("{}ERROR: \"{}\" is not a legal CSR name{}", TColor::RS, csr, TColor::N),
+        Commands::Print { name, value } => {
+            let csr = to_csr(&name, value);
+            match csr {
+                Ok(csr) => {
+                    csr.print();
+                    exit(0);
+                }
+                Err(CsrError::UnkownCsr(csr)) => {
+                    eprintln!(
+                        "\x1b[31m\x1b[1mERROR: \"{}\" is not a legal CSR name\x1b[0m",
+                        csr
+                    );
+                    exit(-1);
+                }
+                Err(CsrError::UnsupportedCsr(csr)) => {
+                    eprintln!(
+                        "\x1b[33m\x1b[1mWARNING: \"{}\" is not (yet) supported\x1b[0m",
+                        csr
+                    );
+                    exit(-1);
+                }
             }
         }
     }
