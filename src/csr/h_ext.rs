@@ -1,6 +1,7 @@
 //! CSR definitions for the hypervisor extension
+use super::base::dec_arch;
 use super::{get_bit, get_bits, Csr};
-use bits::{B1, B2, B6, B64};
+use bits::{Bits, B1, B2, B6, B64};
 
 /**************************************************************/
 /* Hypervisor Status Register                                 */
@@ -36,18 +37,18 @@ impl Csr for Hstatus {
 
     fn print(&self) {
         println!("");
-        println!("HSTATUS");
+        println!("hstatus");
         println!("-------");
-        println!("vsbe: {}", &self.vsbe);
-        println!("gva: {}", &self.gva);
-        println!("spv: {}", &self.spv);
-        println!("spvp: {}", &self.spvp);
-        println!("hu: {}", &self.hu);
-        println!("vgein: {}", &self.vgein);
-        println!("vtvm: {}", &self.vtvm);
-        println!("vtw: {}", &self.vtw);
-        println!("vtsr: {}", &self.vtsr);
-        println!("vsxl: {}", &self.vsxl);
+        println!("VSBE: {}", &self.vsbe);
+        println!("GVA: {}", &self.gva);
+        println!("SPV: {}", &self.spv);
+        println!("SPVP: {}", &self.spvp);
+        println!("HU: {}", &self.hu);
+        println!("VGEIN: {}", &self.vgein);
+        println!("VTVM: {}", &self.vtvm);
+        println!("VTW: {}", &self.vtw);
+        println!("VTSR: {}", &self.vtsr);
+        println!("VSXL: {}", dec_arch(self.vsxl.to_u64()));
     }
 }
 
@@ -62,7 +63,7 @@ impl Csr for Hedeleg {
     }
 
     fn print(&self) {
-        println!("HEDELEG: {}", &self.0);
+        println!("hedeleg: {}", &self.0);
     }
 }
 
@@ -74,6 +75,6 @@ impl Csr for Hideleg {
     }
 
     fn print(&self) {
-        println!("HIDELEG: {}", &self.0);
+        println!("hideleg: {}", &self.0);
     }
 }
