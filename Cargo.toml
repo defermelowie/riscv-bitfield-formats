@@ -11,4 +11,3 @@ readme = "readme.md"
 thiserror = "1.0.40"
 clap = {version="4.1.11",features=['derive']}
 clap-num = "1.0.2"
-bits = {path = "./lib/bits"}

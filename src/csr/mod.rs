@@ -1,5 +1,3 @@
-use std::mem::size_of;
-
 use thiserror::Error;
 
 pub mod base;
@@ -31,13 +29,13 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x143" | "stval" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x144" | "sip" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor Protection and Translation
-        "0x180" | "satp" => Ok(Box::new(self::base::Satp::new(value))),
+        // "0x180" | "satp" => Ok(Box::new(self::base::Satp::new(value))),
         // Debug & Trace Registers
         "0x5a8" | "scontext" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Trap Setup
-        "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
-        "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
-        "0x603" | "hideleg" => Ok(Box::new(self::h_ext::Hideleg::new(value))),
+        // "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
+        // "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
+        // "0x603" | "hideleg" => Ok(Box::new(self::h_ext::Hideleg::new(value))),
         "0x604" | "hie" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x606" | "hcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x607" | "hgeie" => Err(CsrError::UnsupportedCsr(name.into())),
@@ -72,7 +70,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0xf14" | "mhartid" => Ok(Box::new(self::base::Mhartid::new(value))),
         "0xf15" | "mconfigptr" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Setup
-        "0x300" | "mstatus" => Ok(Box::new(self::base::Mstatus::new(value))),
+        // "0x300" | "mstatus" => Ok(Box::new(self::base::Mstatus::new(value))),
         "0x301" | "misa" => Ok(Box::new(self::base::Misa::new(value))),
         "0x302" | "medeleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x303" | "mideleg" => Err(CsrError::UnsupportedCsr(name.into())),
@@ -116,66 +114,4 @@ pub enum CsrError {
     UnkownCsr(String),
     #[error("\x1b[33m\x1b[1mWARNING: \"{0}\" is not (yet) supported\x1b[0m")]
     UnsupportedCsr(String),
-}
-
-pub fn get_bit<I>(value: I, index: usize) -> I
-where
-    I: std::ops::Shl<usize, Output = I>,
-    I: std::ops::Shr<usize, Output = I>,
-{
-    let lastbit = size_of::<I>() * 8 - 1;
-    assert!(lastbit >= index);
-
-    let value = value << (lastbit - index);
-    let value = value >> (lastbit);
-    value
-}
-
-pub fn get_bits<I>(value: I, start: usize, end: usize) -> I
-where
-    I: std::ops::Shl<usize, Output = I>,
-    I: std::ops::Shr<usize, Output = I>,
-{
-    let lastbit = size_of::<I>() * 8 - 1;
-    assert!(lastbit >= end);
-    assert!(end >= start);
-
-    let value = value << (lastbit - end);
-    let value = value >> (lastbit - end + start);
-    value
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn get_bit_u8_1() {
-        assert_eq!(1, get_bit(0b0000_0010_u8, 1));
-    }
-
-    #[test]
-    fn get_bit_u8_0() {
-        assert_eq!(0, get_bit(0b1111_1011_u8, 2));
-    }
-
-    #[test]
-    fn get_bit_u16_1() {
-        assert_eq!(1, get_bit(0x4000_u16, 14));
-    }
-
-    #[test]
-    fn get_bit_u16_0() {
-        assert_eq!(0, get_bit(0xfdff_u16, 9));
-    }
-
-    #[test]
-    fn get_bits_u16_l() {
-        assert_eq!(3, get_bits(0b000_1100_u8, 2, 3))
-    }
-
-    #[test]
-    fn get_bits_u16_m() {
-        assert_eq!(0xf, get_bits(0b011_1100_u8, 2, 5))
-    }
 }
