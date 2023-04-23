@@ -108,9 +108,6 @@ pub trait Csr {
 
     /// Print CSR's value
     fn print(&self);
-
-    /// Get info about a CSR
-    fn info(&self) -> String;
 }
 
 #[derive(Error, Debug)]
