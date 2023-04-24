@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::{mem::size_of, fmt::Display};
 
 /// BitField struct containing it's value
 ///
@@ -7,6 +7,8 @@ pub struct BitField<const START: usize, const END: usize>(u64); // where {START 
 
 impl<const S: usize, const E: usize> BitField<S, E> {
     /// Create a new bitfield from raw CSR value
+    /// 
+    /// Value is taken from bits `START` to `END`
     pub fn new(value: u64) -> Self {
         assert!(S <= E);
         if Self::size() == 1 {
@@ -44,6 +46,17 @@ where
     }
 }
 
+impl <const S: usize, const E:usize> Display for BitField<S, E> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut bit_str = format!("{:b}", &self.0);
+        let zeroes = Self::size() - bit_str.len();
+        for _ in 0..zeroes {
+            bit_str = format!("0{}", bit_str);
+        }
+        write!(f, "0b{}", bit_str)
+    }
+}
+
 fn get_bit<I>(value: I, index: usize) -> I
 where
     I: std::ops::Shl<usize, Output = I>,
@@ -78,7 +91,7 @@ mod test {
     #[test]
     #[should_panic]
     fn bitfield_start_after_end_panics() {
-        let b: BitField<7, 4> = BitField::new(3);
+        let _: BitField<7, 4> = BitField::new(3);
     }
 
     #[test]
@@ -94,6 +107,12 @@ mod test {
         assert_eq!(b.value(), 5);
     }
 
+    #[test]
+    fn bitfield_format() {
+        let b = BitField::<0, 5>::new(0x5);
+        let s = format!("{}", b);
+        assert_eq!(s, "0b000101");
+    }
     #[test]
     fn get_bit_u8() {
         assert_eq!(1, get_bit(0b0000_0010_u8, 1));

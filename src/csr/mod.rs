@@ -29,7 +29,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x143" | "stval" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x144" | "sip" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor Protection and Translation
-        // "0x180" | "satp" => Ok(Box::new(self::base::Satp::new(value))),
+        "0x180" | "satp" => Ok(Box::new(self::base::Satp::new(value))),
         // Debug & Trace Registers
         "0x5a8" | "scontext" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Trap Setup
@@ -70,7 +70,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0xf14" | "mhartid" => Ok(Box::new(self::base::Mhartid::new(value))),
         "0xf15" | "mconfigptr" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Setup
-        // "0x300" | "mstatus" => Ok(Box::new(self::base::Mstatus::new(value))),
+        "0x300" | "mstatus" => Ok(Box::new(self::base::Mstatus::new(value))),
         "0x301" | "misa" => Ok(Box::new(self::base::Misa::new(value))),
         "0x302" | "medeleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x303" | "mideleg" => Err(CsrError::UnsupportedCsr(name.into())),
