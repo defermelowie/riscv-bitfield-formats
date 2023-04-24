@@ -52,28 +52,28 @@ impl Csr for Hstatus {
     }
 }
 
-// /**************************************************************/
-// /* Hypervisor Trap Delegation Registers                       */
-// pub struct Hedeleg(B64);
+/**************************************************************/
+/* Hypervisor Trap Delegation Registers                       */
+pub struct Hedeleg(BitField<0, 63>);
 
-// impl Csr for Hedeleg {
-//     fn new(value: u64) -> Hedeleg {
-//         Hedeleg(B64(value))
-//     }
+impl Csr for Hedeleg {
+    fn new(value: u64) -> Hedeleg {
+        Hedeleg(value.into())
+    }
 
-//     fn print(&self) {
-//         println!("hedeleg: {}", &self.0);
-//     }
-// }
+    fn print(&self) {
+        println!("hedeleg: {}", &self.0);
+    }
+}
 
-// pub struct Hideleg(B64);
+pub struct Hideleg(BitField<0, 63>);
 
-// impl Csr for Hideleg {
-//     fn new(value: u64) -> Hideleg {
-//         Hideleg(B64(value))
-//     }
+impl Csr for Hideleg {
+    fn new(value: u64) -> Hideleg {
+        Hideleg(value.into())
+    }
 
-//     fn print(&self) {
-//         println!("hideleg: {}", &self.0);
-//     }
-// }
+    fn print(&self) {
+        println!("hideleg: {}", &self.0);
+    }
+}
