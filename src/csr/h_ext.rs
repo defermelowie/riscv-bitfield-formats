@@ -1,79 +1,53 @@
 //! CSR definitions for the hypervisor extension
-use crate::bitfield::BitField;
+use csr_macro::Csr;
+use std::fmt::Display;
 
-use super::base::dec_arch;
 use super::Csr;
+use crate::bitfield::BitField;
+use crate::bitfield::{Arch, Bin, Hex, Priv, Atp, Tvec};
 
 /**************************************************************/
 /* Hypervisor Status Register                                 */
+
+#[derive(Csr)]
 pub struct Hstatus {
-    pub vsbe: BitField<5, 5>,
-    pub gva: BitField<6, 6>,
-    pub spv: BitField<7, 7>,
-    pub spvp: BitField<8, 8>,
-    pub hu: BitField<9, 9>,
-    pub vgein: BitField<12, 17>,
-    pub vtvm: BitField<20, 20>,
-    pub vtw: BitField<21, 21>,
-    pub vtsr: BitField<22, 22>,
-    pub vsxl: BitField<32, 33>,
-}
-
-impl Csr for Hstatus {
-    fn new(value: u64) -> Self {
-        Hstatus {
-            vsbe: value.into(),
-            gva: value.into(),
-            spv: value.into(),
-            spvp: value.into(),
-            hu: value.into(),
-            vgein: value.into(),
-            vtvm: value.into(),
-            vtw: value.into(),
-            vtsr: value.into(),
-            vsxl: value.into(),
-        }
-    }
-
-    fn print(&self) {
-        println!("");
-        println!("hstatus");
-        println!("-------");
-        println!("VSBE: {}", &self.vsbe);
-        println!("GVA: {}", &self.gva);
-        println!("SPV: {}", &self.spv);
-        println!("SPVP: {}", &self.spvp);
-        println!("HU: {}", &self.hu);
-        println!("VGEIN: {}", &self.vgein);
-        println!("VTVM: {}", &self.vtvm);
-        println!("VTW: {}", &self.vtw);
-        println!("VTSR: {}", &self.vtsr);
-        println!("VSXL: {}", dec_arch(self.vsxl.value()));
-    }
+    pub vsbe: BitField<Bin, 5, 5>,
+    pub gva: BitField<Bin, 6, 6>,
+    pub spv: BitField<Bin, 7, 7>,
+    pub spvp: BitField<Bin, 8, 8>,
+    pub hu: BitField<Bin, 9, 9>,
+    pub vgein: BitField<Bin, 12, 17>,
+    pub vtvm: BitField<Bin, 20, 20>,
+    pub vtw: BitField<Bin, 21, 21>,
+    pub vtsr: BitField<Bin, 22, 22>,
+    pub vsxl: BitField<Arch, 32, 33>,
 }
 
 /**************************************************************/
 /* Hypervisor Trap Delegation Registers                       */
-pub struct Hedeleg(BitField<0, 63>);
 
-impl Csr for Hedeleg {
-    fn new(value: u64) -> Hedeleg {
-        Hedeleg(value.into())
-    }
-
-    fn print(&self) {
-        println!("hedeleg: {}", &self.0);
-    }
+#[derive(Csr)]
+pub struct Hedeleg {
+    pub misaligned_fetch: BitField<Bin, 0x0, 0x0>,
+    pub fetch_access: BitField<Bin, 0x1, 0x1>,
+    pub illegal_instruction: BitField<Bin, 0x2, 0x2>,
+    pub breakpoint: BitField<Bin, 0x3, 0x3>,
+    pub misaligned_load: BitField<Bin, 0x4, 0x4>,
+    pub load_access: BitField<Bin, 0x5, 0x5>,
+    pub misaligned_store: BitField<Bin, 0x6, 0x6>,
+    pub store_access: BitField<Bin, 0x7, 0x7>,
+    pub user_ecall: BitField<Bin, 0x8, 0x8>,
+    pub supervisor_ecall: BitField<Bin, 0x9, 0x9>,
+    pub virtual_supervisor_ecall: BitField<Bin, 0xa, 0xa>,
+    pub machine_ecall: BitField<Bin, 0xb, 0xb>,
+    pub fetch_page_fault: BitField<Bin, 0xc, 0xc>,
+    pub load_page_fault: BitField<Bin, 0xd, 0xd>,
+    pub store_page_fault: BitField<Bin, 0xf, 0xf>,
+    pub fetch_guest_page_fault: BitField<Bin, 0x14, 0x14>,
+    pub load_guest_page_fault: BitField<Bin, 0x15, 0x15>,
+    pub virtual_instruction: BitField<Bin, 0x16, 0x16>,
+    pub store_guest_page_fault: BitField<Bin, 0x17, 0x17>,
 }
 
-pub struct Hideleg(BitField<0, 63>);
-
-impl Csr for Hideleg {
-    fn new(value: u64) -> Hideleg {
-        Hideleg(value.into())
-    }
-
-    fn print(&self) {
-        println!("hideleg: {}", &self.0);
-    }
-}
+// #[derive(Csr)]
+// pub struct Hideleg(BitField<0, 63>);

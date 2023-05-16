@@ -1,22 +1,103 @@
 //! Defines a generic bitfield type
+use std::{fmt::Display, mem::size_of, marker::PhantomData};
 
-use std::{mem::size_of, fmt::Display};
+/// Binary
+pub struct Bin;
+impl BitFieldType for Bin {
+    fn decode(value: u64, size: usize) -> String {
+        let bit_str = format!("{:b}", value);
+        let zeroes = "0".repeat(size - bit_str.len());
+        format!("0b{}{}", zeroes, bit_str)
+    }
+}
+/// Hexidecimal
+pub struct Hex;
+impl BitFieldType for Hex {
+    fn decode(value: u64, _size: usize) -> String {
+        format!("0x{:x}", value)
+    }
+}
+/// Architecture
+pub struct Arch;
+impl BitFieldType for Arch {
+    /// Decode architecture
+    fn decode(value: u64, _size: usize) -> String {
+        match value {
+            0b01 => "RV32".into(),
+            0b10 => "RV64".into(),
+            0b11 => "RV128".into(),
+            n => format!("\x1b[33mInvalid architecture (0b{:b})\x1b[0m", n),
+        }
+    }
+}
+/// Privilege level
+pub struct Priv;
+impl BitFieldType for Priv {
+    /// Decode privilege level
+    fn decode(value: u64, _size: usize) -> String {
+        match value {
+            0b00 => "User".into(),
+            0b01 => "Supervisor".into(),
+            0b11 => "Machine".into(),
+            n => format!("\x1b[33mInvalid privilege (0b{:b})\x1b[0m", n),
+        }
+    }
+}
+/// Address translation & protection mode
+pub struct Atp;
+impl BitFieldType for Atp {
+    /// Decode address translation mode
+    fn decode(value: u64, _size: usize) -> String {
+        match value {
+            0x0 => "Bare".into(),
+            0x1 => "Sv32".into(),
+            0x8 => "Sv39".into(),
+            0x9 => "Sv48".into(),
+            0xa => "Sv57".into(),
+            n => format!(
+                "\x1b[33mInvalid address translation mode (0b{:b})\x1b[0m",
+                n
+            ),
+        }
+    }
+}
+/// Trap vector mode
+pub struct Tvec;
+impl BitFieldType for Tvec {
+    /// Decode xtvec mode field
+    fn decode(value: u64, _size: usize) -> String {
+        match value {
+            0x0 => "Direct".into(),
+            0x1 => "Vectored".into(),
+            n => format!("\x1b[33mInvalid (0b{:b})\x1b[0m", n),
+        }
+    }
+}
+
+/// Bitfield types only differ in the format they are printed
+trait BitFieldType {
+    fn decode(value: u64, size: usize) -> String;
+}
 
 /// A bitfield with 2 constant generics to indicate the position of it's first and last bit
 ///
 /// Requires `START <= END`
-pub struct BitField<const START: usize, const END: usize>(u64); // where {START <= END}
+///
+/// Notes:
+/// - Add `where {START <= END}` whenever arithmitic on constants in where clauses gets supported.
+/// - Make `BitFieldType::Bin` default whenever const genereic defaults for complex types gets supported.
+pub struct BitField<T, const START: usize, const END: usize>(u64, PhantomData<T>);
 
-impl<const S: usize, const E: usize> BitField<S, E> {
+impl<T, const S: usize, const E: usize> BitField<T, S, E> {
     /// Create a new bitfield from a raw value
-    /// 
+    ///
     /// Value is taken from bits `START` to `END`
     pub fn new(value: u64) -> Self {
         assert!(S <= E);
         if Self::size() == 1 {
-            BitField(get_bit(value.into(), S))
+            BitField(get_bit(value.into(), S), PhantomData)
         } else {
-            BitField(get_bits(value.into(), S, E))
+            BitField(get_bits(value.into(), S, E), PhantomData)
         }
     }
 
@@ -39,23 +120,20 @@ impl<const S: usize, const E: usize> BitField<S, E> {
     }
 }
 
-impl<I, const S: usize, const E: usize> From<I> for BitField<S, E>
+impl<I, T, const S: usize, const E: usize> From<I> for BitField<T, S, E>
 where
     I: Into<u64>,
 {
+    /// Converts any integer value into a bitfield
     fn from(value: I) -> Self {
         BitField::new(value.into())
     }
 }
 
-impl <const S: usize, const E:usize> Display for BitField<S, E> {
+impl<T: BitFieldType, const S: usize, const E: usize> Display for BitField<T, S, E>
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut bit_str = format!("{:b}", &self.0);
-        let zeroes = Self::size() - bit_str.len();
-        for _ in 0..zeroes {
-            bit_str = format!("0{}", bit_str);
-        }
-        write!(f, "0b{}", bit_str)
+        write!(f, "{}", T::decode(self.value(), Self::size()))
     }
 }
 
@@ -95,25 +173,25 @@ mod test {
     #[test]
     #[should_panic]
     fn bitfield_start_after_end_panics() {
-        let _: BitField<7, 4> = BitField::new(3);
+        let _: BitField<Bin, 7, 4> = BitField::new(3);
     }
 
     #[test]
     fn bitfield_size() {
-        let s = BitField::<4, 7>::size();
+        let s = BitField::<Bin, 4, 7>::size();
         assert_eq!(s, 4);
     }
 
     #[test]
     fn bitfield_from_u64() {
         let v = 0x4756_u64;
-        let b: BitField<2, 5> = v.into();
+        let b: BitField<Bin, 2, 5> = v.into();
         assert_eq!(b.value(), 5);
     }
 
     #[test]
-    fn bitfield_format() {
-        let b = BitField::<0, 5>::new(0x5);
+    fn bitfield_format_bin() {
+        let b = BitField::<Bin, 0, 5>::new(0x5);
         let s = format!("{}", b);
         assert_eq!(s, "0b000101");
     }

@@ -20,7 +20,7 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
     match to_csr(&cli.name, cli.value) {
-        Ok(csr) => csr.print(),
+        Ok(csr) => print!("{}", csr),
         Err(e) => eprint!("{}", e),
     }
 }

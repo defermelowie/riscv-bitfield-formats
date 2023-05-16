@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use thiserror::Error;
 
 pub mod base;
@@ -35,7 +37,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         // Hypervisor Trap Setup
         "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
         "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
-        "0x603" | "hideleg" => Ok(Box::new(self::h_ext::Hideleg::new(value))),
+        "0x603" | "hideleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x604" | "hie" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x606" | "hcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x607" | "hgeie" => Err(CsrError::UnsupportedCsr(name.into())),
@@ -98,14 +100,17 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
     }
 }
 
-pub trait Csr {
+pub trait Csr
+where
+    Self: Display,
+{
     /// Create a new CSR instance from a value
     fn new(value: u64) -> Self
     where
         Self: Sized;
 
-    /// Print CSR's value
-    fn print(&self);
+    /// Get CSR's name
+    fn name(&self) -> String;
 }
 
 #[derive(Error, Debug)]
