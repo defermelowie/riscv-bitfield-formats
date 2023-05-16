@@ -1,5 +1,5 @@
 //! CSR definitions for the hypervisor extension
-use crate::bit::BitField;
+use crate::bitfield::BitField;
 
 use super::base::dec_arch;
 use super::Csr;

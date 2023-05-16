@@ -1,12 +1,14 @@
+//! Defines a generic bitfield type
+
 use std::{mem::size_of, fmt::Display};
 
-/// BitField struct containing it's value
+/// A bitfield with 2 constant generics to indicate the position of it's first and last bit
 ///
 /// Requires `START <= END`
 pub struct BitField<const START: usize, const END: usize>(u64); // where {START <= END}
 
 impl<const S: usize, const E: usize> BitField<S, E> {
-    /// Create a new bitfield from raw CSR value
+    /// Create a new bitfield from a raw value
     /// 
     /// Value is taken from bits `START` to `END`
     pub fn new(value: u64) -> Self {
@@ -57,6 +59,7 @@ impl <const S: usize, const E:usize> Display for BitField<S, E> {
     }
 }
 
+/// Get the bit at a specified index
 fn get_bit<I>(value: I, index: usize) -> I
 where
     I: std::ops::Shl<usize, Output = I>,
@@ -70,6 +73,7 @@ where
     value
 }
 
+/// Get the bits between 2 specified indices
 fn get_bits<I>(value: I, start: usize, end: usize) -> I
 where
     I: std::ops::Shl<usize, Output = I>,

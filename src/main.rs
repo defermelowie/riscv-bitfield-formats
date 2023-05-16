@@ -1,7 +1,7 @@
 use clap::Parser;
 use clap_num::maybe_hex;
 
-mod bit;
+mod bitfield;
 
 mod csr;
 use csr::to_csr;

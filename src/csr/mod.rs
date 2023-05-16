@@ -33,9 +33,9 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         // Debug & Trace Registers
         "0x5a8" | "scontext" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Trap Setup
-        // "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
-        // "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
-        // "0x603" | "hideleg" => Ok(Box::new(self::h_ext::Hideleg::new(value))),
+        "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
+        "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
+        "0x603" | "hideleg" => Ok(Box::new(self::h_ext::Hideleg::new(value))),
         "0x604" | "hie" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x606" | "hcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x607" | "hgeie" => Err(CsrError::UnsupportedCsr(name.into())),
@@ -75,7 +75,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x302" | "medeleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x303" | "mideleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x304" | "mie" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x305" | "mtvec" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x305" | "mtvec" => Ok(Box::new(self::base::Mtvec::new(value))),
         "0x306" | "mcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Handling
         "0x340" | "mscratch" => Err(CsrError::UnsupportedCsr(name.into())),

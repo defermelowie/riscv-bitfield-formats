@@ -1,7 +1,7 @@
 //! CSR definitions for the base ISA spec
 
 use super::Csr;
-use crate::bit::BitField;
+use crate::bitfield::BitField;
 
 /**************************************************************/
 /* Machine ISA Register                                       */
@@ -293,6 +293,31 @@ impl Csr for Satp {
 }
 
 /**************************************************************/
+/* Machine Trap-Vector Base-Address Register                  */
+
+pub struct Mtvec {
+    base: BitField<2, 63>,
+    mode: BitField<0, 1>,
+}
+
+impl Csr for Mtvec {
+    fn new(value: u64) -> Self {
+        Mtvec {
+            base: value.into(),
+            mode: value.into(),
+        }
+    }
+
+    fn print(&self) {
+        println!("");
+        println!("mtvec");
+        println!("-----");
+        println!("BASE: 0x{:x}", &self.base.value() << 2);
+        println!("MODE: {}", dec_xtvec_mode(self.mode.value()));
+    }
+}
+
+/**************************************************************/
 /* Helper functions                                           */
 /// Decode architecture
 pub fn dec_arch(architecture: u64) -> String {
@@ -324,6 +349,18 @@ pub fn dec_at_mode(mode: u64) -> String {
         0xa => "Sv57".into(),
         n => format!(
             "\x1b[33mInvalid address translation mode (0b{:b})\x1b[0m",
+            n
+        ),
+    }
+}
+
+// Decode xtvec mode field
+pub fn dec_xtvec_mode(mode: u64) -> String {
+    match mode {
+        0x0 => "Direct".into(),
+        0x1 => "Vectored".into(),
+        n => format!(
+            "\x1b[33mInvalid (0b{:b})\x1b[0m",
             n
         ),
     }
