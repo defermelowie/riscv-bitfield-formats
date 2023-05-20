@@ -2,8 +2,13 @@ use std::fmt::Display;
 
 use thiserror::Error;
 
-pub mod base;
-pub mod h_ext;
+// Export CSRs
+mod m_level;
+pub use m_level::*;
+mod h_level;
+pub use h_level::*;
+mod s_level;
+pub use s_level::*;
 
 /// Get a csr from a name/address and value
 pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
@@ -18,66 +23,66 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0xc02" | "instret" => Err(CsrError::UnsupportedCsr(name.into())),
         "hmpcounter" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor trap setup
-        "0x100" | "sstatus" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x100" | "sstatus" => Ok(Box::new(Sstatus::new(value))),
         "0x104" | "sie" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x105" | "stvec" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x106" | "scounteren" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x105" | "stvec" => Ok(Box::new(Stvec::new(value))),
+        "0x106" | "scounteren" => Ok(Box::new(Scounteren::new(value))),
         // Supervisor config
         "0x10a" | "senvcfg" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor trap handling
-        "0x140" | "sscratch" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x141" | "sepc" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x142" | "scause" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x140" | "sscratch" => Ok(Box::new(Sscratch::new(value))),
+        "0x141" | "sepc" => Ok(Box::new(Sepc::new(value))),
+        "0x142" | "scause" => Ok(Box::new(Scause::new(value))),
         "0x143" | "stval" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x144" | "sip" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor Protection and Translation
-        "0x180" | "satp" => Ok(Box::new(self::base::Satp::new(value))),
+        "0x180" | "satp" => Ok(Box::new(Satp::new(value))),
         // Debug & Trace Registers
         "0x5a8" | "scontext" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Trap Setup
-        "0x600" | "hstatus" => Ok(Box::new(self::h_ext::Hstatus::new(value))),
-        "0x602" | "hedeleg" => Ok(Box::new(self::h_ext::Hedeleg::new(value))),
+        "0x600" | "hstatus" => Ok(Box::new(Hstatus::new(value))),
+        "0x602" | "hedeleg" => Ok(Box::new(Hedeleg::new(value))),
         "0x603" | "hideleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x604" | "hie" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x606" | "hcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x606" | "hcounteren" => Ok(Box::new(Hcounteren::new(value))),
         "0x607" | "hgeie" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Trap Handling
-        "0x643" | "htval" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x643" | "htval" => Ok(Box::new(Htval::new(value))),
         "0x644" | "hip" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x645" | "hvip" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x64a" | "htinst" => Err(CsrError::UnsupportedCsr(name.into())),
         "0xe12" | "hgeip" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor configuration
-        "0x60a" | "henvcfg" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x60a" | "henvcfg" => Ok(Box::new(Henvcfg::new(value))),
         // Hypervisor Protection and Translation
-        "0x680" | "hgatp" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x680" | "hgatp" => Ok(Box::new(Hgatp::new(value))),
         // Debug/Trace Registers
         "0x6a8" | "hcontext" => Err(CsrError::UnsupportedCsr(name.into())),
         // Hypervisor Counter/Timer Virtualization Registers
         "0x605" | "htimedelta" => Err(CsrError::UnsupportedCsr(name.into())),
         // Virtual Supervisor Registers
-        "0x200" | "vsstatus" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x200" | "vsstatus" => Ok(Box::new(Sstatus::new(value))),
         "0x204" | "vsie" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x205" | "vstvec" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x240" | "vsscratch" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x241" | "vsepc" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x242" | "vscause" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x205" | "vstvec" => Ok(Box::new(Stvec::new(value))),
+        "0x240" | "vsscratch" => Ok(Box::new(Sscratch::new(value))),
+        "0x241" | "vsepc" => Ok(Box::new(Sepc::new(value))),
+        "0x242" | "vscause" => Ok(Box::new(Scause::new(value))),
         "0x243" | "vstval" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x244" | "vsip" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x280" | "vsatp" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x280" | "vsatp" => Ok(Box::new(Satp::new(value))),
         // Machine Information Registers
-        "0xf11" | "mvendorid" => Ok(Box::new(self::base::Mvendorid::new(value))),
-        "0xf12" | "marchid" => Ok(Box::new(self::base::Marchid::new(value))),
-        "0xf13" | "mimpid" => Ok(Box::new(self::base::Mimpid::new(value))),
-        "0xf14" | "mhartid" => Ok(Box::new(self::base::Mhartid::new(value))),
+        "0xf11" | "mvendorid" => Ok(Box::new(Mvendorid::new(value))),
+        "0xf12" | "marchid" => Ok(Box::new(Marchid::new(value))),
+        "0xf13" | "mimpid" => Ok(Box::new(Mimpid::new(value))),
+        "0xf14" | "mhartid" => Ok(Box::new(Mhartid::new(value))),
         "0xf15" | "mconfigptr" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Setup
-        "0x300" | "mstatus" => Ok(Box::new(self::base::Mstatus::new(value))),
-        "0x301" | "misa" => Ok(Box::new(self::base::Misa::new(value))),
+        "0x300" | "mstatus" => Ok(Box::new(Mstatus::new(value))),
+        "0x301" | "misa" => Ok(Box::new(Misa::new(value))),
         "0x302" | "medeleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x303" | "mideleg" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x304" | "mie" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x305" | "mtvec" => Ok(Box::new(self::base::Mtvec::new(value))),
+        "0x305" | "mtvec" => Ok(Box::new(Mtvec::new(value))),
         "0x306" | "mcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Handling
         "0x340" | "mscratch" => Err(CsrError::UnsupportedCsr(name.into())),

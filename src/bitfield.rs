@@ -10,11 +10,29 @@ impl BitFieldType for Bin {
         format!("0b{}{}", zeroes, bit_str)
     }
 }
+/// Boolean
+pub struct Bool;
+impl BitFieldType for Bool {
+    fn decode(value: u64, _size: usize) -> String {
+        match value {
+            0b0 => "false".into(),
+            0b1 => "true".into(),
+            n => format!("\x1b[33mCould not represent 0b{:b} as boolean\x1b[0m", n),
+        }
+    }
+}
 /// Hexidecimal
 pub struct Hex;
 impl BitFieldType for Hex {
     fn decode(value: u64, _size: usize) -> String {
         format!("0x{:x}", value)
+    }
+}
+/// Decimal
+pub struct Dec;
+impl BitFieldType for Dec {
+    fn decode(value: u64, _size: usize) -> String {
+        format!("{}", value)
     }
 }
 /// Architecture
@@ -70,6 +88,48 @@ impl BitFieldType for Tvec {
             0x0 => "Direct".into(),
             0x1 => "Vectored".into(),
             n => format!("\x1b[33mInvalid (0b{:b})\x1b[0m", n),
+        }
+    }
+}
+/// Trap cause exception code
+pub struct ExcCode;
+impl BitFieldType for ExcCode {
+    fn decode(value: u64, _size: usize) -> String {
+        let interrupt = get_bit(value, 63);
+        let code = get_bits(value, 0, 62);
+        match (interrupt, code) {
+            // Interrupts
+            (0b1, 1) => "Supervisor software interrupt".into(),
+            (0b1, 2) => "Virtual supervisor software interrupt".into(),
+            (0b1, 3) => "Machine software interrupt".into(),
+            (0b1, 5) => "Supervisor timer interrupt".into(),
+            (0b1, 6) => "Virtual supervisor timer interrupt".into(),
+            (0b1, 7) => "Machine timer interrupt".into(),
+            (0b1, 9) => "Supervisor external interrupt".into(),
+            (0b1, 10) => "Virtual supervisor external interrupt".into(),
+            (0b1, 11) => "Machine external interrupt".into(),
+            (0b1, 12) => "Supervisor guest external interrrupt".into(),
+            // Synchronous exceptions
+            (0b0, 0) => "Instruction address misaligned".into(),
+            (0b0, 1) => "Instruction access fault".into(),
+            (0b0, 2) => "Illegal instruction".into(),
+            (0b0, 3) => "Breakpoint".into(),
+            (0b0, 4) => "Load address misaligned".into(),
+            (0b0, 5) => "Load access fault".into(),
+            (0b0, 6) => "Store/AMO address misaligned".into(),
+            (0b0, 7) => "Store/AMO access fault".into(),
+            (0b0, 8) => "Environment call from U-mode".into(),
+            (0b0, 9) => "Environment call from HS-mode".into(),
+            (0b0, 10) => "Environment call from VS-mode".into(),
+            (0b0, 11) => "Environment call from M-mode".into(),
+            (0b0, 12) => "Instruction page fault".into(),
+            (0b0, 13) => "Load page fault".into(),
+            (0b0, 15) => "Store/AMO page fault".into(),
+            (0b0, 20) => "Instruction guest-page fault".into(),
+            (0b0, 21) => "Load guest-page fault".into(),
+            (0b0, 22) => "Virtual instruction".into(),
+            (0b0, 23) => "Store/AMO guest-page fault".into(),
+            _ => format!("\x1b[33mUnknown exception code ({})\x1b[0m", code)
         }
     }
 }

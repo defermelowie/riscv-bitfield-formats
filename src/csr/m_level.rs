@@ -1,4 +1,4 @@
-//! CSR definitions for the base ISA spec
+//! Definitions for the machine mode CSRs
 use csr_macro::Csr;
 use std::fmt::Display;
 
@@ -101,16 +101,6 @@ pub struct Mstatus {
     gva: BitField<Bin, 38, 38>,
     mpv: BitField<Bin, 39, 39>,
     sd: BitField<Bin, 63, 63>,
-}
-
-/**************************************************************/
-/* Supervisor Address Translation and Protection Register     */
-
-#[derive(Csr)]
-pub struct Satp {
-    mode: BitField<Atp, 60, 63>,
-    asid: BitField<Hex, 44, 59>,
-    ppn: BitField<Hex, 0, 43>,
 }
 
 /**************************************************************/
