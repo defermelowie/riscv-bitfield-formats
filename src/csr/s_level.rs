@@ -22,6 +22,36 @@ pub struct Sstatus {
     sd: BitField<Bin, 63, 63>,
 }
 
+/// Supervisor Interrupt Enable Register
+#[derive(Csr)]
+pub struct Sie {
+    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
+    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
+    supervisor_external_interrupt: BitField<Bin, 9, 9>,
+}
+
+/// Supervisor Interrupt Pending Register
+#[derive(Csr)]
+pub struct Sip {
+    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
+    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
+    supervisor_external_interrupt: BitField<Bin, 9, 9>,
+}
+
+/// Supervisor Environment Configuration Register
+#[derive(Csr)]
+pub struct Senvcfg {
+    fiom: BitField<Bin, 0, 0>,
+    cbie: BitField<Bin, 4, 5>,
+    cbcfe: BitField<Bin, 7, 7>,
+}
+
+/// Supervisor Trap Value Register
+#[derive(Csr)]
+pub struct Stval {
+    stval: BitField<Hex, 0, 63>,
+}
+
 /// Supervisor Address Translation and Protection Register
 #[derive(Csr)]
 pub struct Satp {
@@ -53,7 +83,7 @@ pub struct Sepc {
 #[derive(Csr)]
 pub struct Scause {
     interrupt: BitField<Bool, 63, 63>,
-    // Fixme: exeption code is scause[0,62] but for formatting purposes, the interrupt flag (scause[63]) is included into this bitfield as well
+    // FIXME: exeption code is scause[0,62] but for formatting purposes, the interrupt flag (scause[63]) is included into this bitfield as well
     code: BitField<ExcCode, 0, 63>,
 }
 

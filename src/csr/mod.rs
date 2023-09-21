@@ -24,17 +24,17 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "hmpcounter" => Err(CsrError::UnsupportedCsr(name.into())),
         // Supervisor trap setup
         "0x100" | "sstatus" => Ok(Box::new(Sstatus::new(value))),
-        "0x104" | "sie" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x104" | "sie" => Ok(Box::new(Sie::new(value))),
         "0x105" | "stvec" => Ok(Box::new(Stvec::new(value))),
         "0x106" | "scounteren" => Ok(Box::new(Scounteren::new(value))),
         // Supervisor config
-        "0x10a" | "senvcfg" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x10a" | "senvcfg" => Ok(Box::new(Senvcfg::new(value))),
         // Supervisor trap handling
         "0x140" | "sscratch" => Ok(Box::new(Sscratch::new(value))),
         "0x141" | "sepc" => Ok(Box::new(Sepc::new(value))),
         "0x142" | "scause" => Ok(Box::new(Scause::new(value))),
-        "0x143" | "stval" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x144" | "sip" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x143" | "stval" => Ok(Box::new(Stval::new(value))),
+        "0x144" | "sip" => Ok(Box::new(Sip::new(value))),
         // Supervisor Protection and Translation
         "0x180" | "satp" => Ok(Box::new(Satp::new(value))),
         // Debug & Trace Registers
@@ -79,9 +79,9 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         // Machine Trap Setup
         "0x300" | "mstatus" => Ok(Box::new(Mstatus::new(value))),
         "0x301" | "misa" => Ok(Box::new(Misa::new(value))),
-        "0x302" | "medeleg" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x303" | "mideleg" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x304" | "mie" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x302" | "medeleg" => Ok(Box::new(Medeleg::new(value))),
+        "0x303" | "mideleg" => Ok(Box::new(Mideleg::new(value))),
+        "0x304" | "mie" => Ok(Box::new(Mie::new(value))),
         "0x305" | "mtvec" => Ok(Box::new(Mtvec::new(value))),
         "0x306" | "mcounteren" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Trap Handling
@@ -89,7 +89,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x341" | "mepc" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x342" | "mcause" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x343" | "mtval" => Err(CsrError::UnsupportedCsr(name.into())),
-        "0x344" | "mip" => Err(CsrError::UnsupportedCsr(name.into())),
+        "0x344" | "mip" => Ok(Box::new(Mip::new(value))),
         "0x34A" | "mtinst" => Err(CsrError::UnsupportedCsr(name.into())),
         "0x34B" | "mtval2" => Err(CsrError::UnsupportedCsr(name.into())),
         // Machine Configuration
@@ -120,7 +120,7 @@ where
 
 #[derive(Error, Debug)]
 pub enum CsrError {
-    #[error("\x1b[31m\x1b[1mERROR: \"{0}\" is not a legal CSR name\x1b[0m")]
+    #[error("\x1b[31m\x1b[1mERROR: \"{0}\" is not a known legal CSR name\x1b[0m")]
     UnkownCsr(String),
     #[error("\x1b[33m\x1b[1mWARNING: \"{0}\" is not (yet) supported\x1b[0m")]
     UnsupportedCsr(String),

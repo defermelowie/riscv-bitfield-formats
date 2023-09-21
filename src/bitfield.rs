@@ -1,4 +1,4 @@
-//! Defines a generic bitfield type
+//! Defines a generic Bitfield struct as well as types for formatting
 use std::{fmt::Display, mem::size_of, marker::PhantomData};
 
 /// Binary
@@ -35,6 +35,17 @@ impl BitFieldType for Dec {
         format!("{}", value)
     }
 }
+/// TODO: Reserved
+// pub struct Reserved<const VAL: usize>;
+// impl BitFieldType for Reserved<> {
+//     fn decode(value: u64, _size: usize) -> String {
+//         if value != Self::VAL {
+//             format!("\x1b[33mField has invallid value (0x{:x})\x1b[0m", value)
+//         } else {
+//             value.into()
+//         }
+//     }
+// }
 /// Architecture
 pub struct Arch;
 impl BitFieldType for Arch {

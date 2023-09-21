@@ -6,9 +6,8 @@ use super::Csr;
 use crate::bitfield::BitField;
 use crate::bitfield::{Arch, Bin, Hex, Priv, Atp, Tvec};
 
-/**************************************************************/
-/* Machine ISA Register                                       */
 
+/// Machine ISA Register
 #[derive(Csr)]
 pub struct Misa {
     a: BitField<Bin, 0, 0>,
@@ -40,42 +39,35 @@ pub struct Misa {
     mxl: BitField<Arch, 62, 63>,
 }
 
-/**************************************************************/
-/* Machine Vendor ID Register                                 */
-
+/// Machine Vendor ID Register
 #[derive(Csr)]
 pub struct Mvendorid {
     offset: BitField<Hex, 0, 6>,
     bank: BitField<Hex, 7, 31>,
 }
 
-/**************************************************************/
-/* Machine Architecture ID Register                           */
 
+/// Machine Architecture ID Register
 #[derive(Csr)]
 pub struct Marchid {
     id: BitField<Hex, 0, 63>,
 }
 
-/**************************************************************/
-/* Machine Implementation ID Register                         */
-
+/// Machine Implementation ID Register
 #[derive(Csr)]
 pub struct Mimpid {
     id: BitField<Hex, 0, 63>,
 }
 
-/**************************************************************/
-/* Hart ID Register                                           */
 
+/// Hart ID Register                         
 #[derive(Csr)]
 pub struct Mhartid {
     id: BitField<Hex, 0, 63>,
 }
 
-/**************************************************************/
-/* Machine Status Register                                    */
 
+/// Machine Status Register                  
 #[derive(Csr)]
 pub struct Mstatus {
     sie: BitField<Bin, 1, 1>,
@@ -103,11 +95,81 @@ pub struct Mstatus {
     sd: BitField<Bin, 63, 63>,
 }
 
-/**************************************************************/
-/* Machine Trap-Vector Base-Address Register                  */
 
+/// Machine Trap-Vector Base-Address Register
 #[derive(Csr)]
 pub struct Mtvec {
     base: BitField<Hex, 2, 63>,
     mode: BitField<Tvec, 0, 1>,
+}
+
+/// Machine Exception Delegation Register
+#[derive(Csr)]
+pub struct Medeleg {
+    misaligned_fetch: BitField<Bin, 0x0, 0x0>,
+    fetch_access: BitField<Bin, 0x1, 0x1>,
+    illegal_instruction: BitField<Bin, 0x2, 0x2>,
+    breakpoint: BitField<Bin, 0x3, 0x3>,
+    misaligned_load: BitField<Bin, 0x4, 0x4>,
+    load_access: BitField<Bin, 0x5, 0x5>,
+    misaligned_store: BitField<Bin, 0x6, 0x6>,
+    store_access: BitField<Bin, 0x7, 0x7>,
+    user_ecall: BitField<Bin, 0x8, 0x8>,
+    supervisor_ecall: BitField<Bin, 0x9, 0x9>,
+    virtual_supervisor_ecall: BitField<Bin, 0xa, 0xa>,
+    machine_ecall: BitField<Bin, 0xb, 0xb>,
+    fetch_page_fault: BitField<Bin, 0xc, 0xc>,
+    load_page_fault: BitField<Bin, 0xd, 0xd>,
+    store_page_fault: BitField<Bin, 0xf, 0xf>,
+    fetch_guest_page_fault: BitField<Bin, 0x14, 0x14>,
+    load_guest_page_fault: BitField<Bin, 0x15, 0x15>,
+    virtual_instruction: BitField<Bin, 0x16, 0x16>,
+    store_guest_page_fault: BitField<Bin, 0x17, 0x17>,
+}
+
+/// TODO: reuse register structs and define views
+
+/// Machine Interrupt Delegation Register
+#[derive(Csr)]
+pub struct Mideleg {
+    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
+    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
+    machine_sw_interrupt: BitField<Bin, 3, 3>,
+    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
+    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
+    machine_timer_interrupt: BitField<Bin, 7, 7>,
+    supervisor_external_interrupt: BitField<Bin, 9, 9>,
+    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
+    machine_external_interrupt: BitField<Bin, 11, 11>,
+    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
+}
+
+/// Machine Interrupt Enable Register
+#[derive(Csr)]
+pub struct Mie {
+    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
+    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
+    machine_sw_interrupt: BitField<Bin, 3, 3>,
+    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
+    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
+    machine_timer_interrupt: BitField<Bin, 7, 7>,
+    supervisor_external_interrupt: BitField<Bin, 9, 9>,
+    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
+    machine_external_interrupt: BitField<Bin, 11, 11>,
+    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
+}
+
+/// Machine Interrupt Pending Register
+#[derive(Csr)]
+pub struct Mip {
+    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
+    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
+    machine_sw_interrupt: BitField<Bin, 3, 3>,
+    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
+    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
+    machine_timer_interrupt: BitField<Bin, 7, 7>,
+    supervisor_external_interrupt: BitField<Bin, 9, 9>,
+    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
+    machine_external_interrupt: BitField<Bin, 11, 11>,
+    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
 }
