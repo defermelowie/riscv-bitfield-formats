@@ -90,10 +90,20 @@ impl BitFieldType for Atp {
         }
     }
 }
+/// Virtual page number
+pub struct Vpn;
+impl BitFieldType for Vpn{
+    fn decode(value: u64, size: usize) -> String {
+        match size {
+            10 => format!("0x{:x} -> 0x{:x}", value, value << 2), // sizeof(vpn[i]) = 10 => RV32 => sizeof(pte) = 2**2 bytes
+            9 => format!("0x{:x} -> 0x{:x}", value, value << 3),  // sizeof(vpn[i]) = 9 => RV64 => sizeof(pte) = 2**3 bytes
+            _ => format!("0x{:x} - \x1b[33mUnknown architecture\x1b[0m", value),
+        }
+    }
+}
 /// Pysical page number
 pub struct Ppn<const ATP: usize>;
 impl BitFieldType for Ppn<32> {
-    /// Decode address translation mode
     fn decode(value: u64, _size: usize) -> String {
         format!(
             "0x{:x} 0x{:x} -> 0x{:x}",
@@ -104,7 +114,6 @@ impl BitFieldType for Ppn<32> {
     }
 }
 impl BitFieldType for Ppn<39> {
-    /// Decode address translation mode
     fn decode(value: u64, _size: usize) -> String {
         format!(
             "0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",
@@ -116,7 +125,6 @@ impl BitFieldType for Ppn<39> {
     }
 }
 impl BitFieldType for Ppn<48> {
-    /// Decode address translation mode
     fn decode(value: u64, _size: usize) -> String {
         format!(
             "0x{:x} 0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",
@@ -129,7 +137,6 @@ impl BitFieldType for Ppn<48> {
     }
 }
 impl BitFieldType for Ppn<57> {
-    /// Decode address translation mode
     fn decode(value: u64, _size: usize) -> String {
         format!(
             "0x{:x} 0x{:x} 0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",

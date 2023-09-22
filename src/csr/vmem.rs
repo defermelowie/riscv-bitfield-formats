@@ -7,72 +7,72 @@ use std::fmt::Display;
 
 use super::Csr;
 use crate::bitfield::BitField;
-use crate::bitfield::{Bin, Hex, Ppn};
+use crate::bitfield::{Bin, Hex, Ppn, Vpn};
 
 /// Sv32 Virtual Address
 #[derive(Csr)]
 pub struct VAddr32 {
     page_offset: BitField<Hex, 0, 11>,
-    vpn0: BitField<Hex, 12, 21>,
-    vpn1: BitField<Hex, 22, 31>,
+    vpn0: BitField<Vpn, 12, 21>,
+    vpn1: BitField<Vpn, 22, 31>,
 }
 
 /// Sv39 Virtual Address
 #[derive(Csr)]
 pub struct VAddr39 {
     page_offset: BitField<Hex, 0, 11>,
-    vpn0: BitField<Hex, 12, 20>,
-    vpn1: BitField<Hex, 21, 29>,
-    vpn2: BitField<Hex, 30, 38>,
+    vpn0: BitField<Vpn, 12, 20>,
+    vpn1: BitField<Vpn, 21, 29>,
+    vpn2: BitField<Vpn, 30, 38>,
 }
 
 /// Sv48 Virtual Address
 #[derive(Csr)]
 pub struct VAddr48 {
     page_offset: BitField<Hex, 0, 11>,
-    vpn0: BitField<Hex, 12, 20>,
-    vpn1: BitField<Hex, 21, 29>,
-    vpn2: BitField<Hex, 30, 38>,
-    vpn3: BitField<Hex, 39, 47>,
+    vpn0: BitField<Vpn, 12, 20>,
+    vpn1: BitField<Vpn, 21, 29>,
+    vpn2: BitField<Vpn, 30, 38>,
+    vpn3: BitField<Vpn, 39, 47>,
 }
 
 /// Sv57 Virtual Address
 #[derive(Csr)]
 pub struct VAddr57 {
     page_offset: BitField<Hex, 0, 11>,
-    vpn0: BitField<Hex, 12, 20>,
-    vpn1: BitField<Hex, 21, 29>,
-    vpn2: BitField<Hex, 30, 38>,
-    vpn3: BitField<Hex, 39, 47>,
-    vpn4: BitField<Hex, 48, 56>,
+    vpn0: BitField<Vpn, 12, 20>,
+    vpn1: BitField<Vpn, 21, 29>,
+    vpn2: BitField<Vpn, 30, 38>,
+    vpn3: BitField<Vpn, 39, 47>,
+    vpn4: BitField<Vpn, 48, 56>,
 }
 
 /// Sv32 Physical Address
 #[derive(Csr)]
 pub struct PAddr32 {
     page_offset: BitField<Hex, 0, 11>,
-    ppn0: BitField<Ppn<32>, 12, 33>,
+    ppn: BitField<Ppn<32>, 12, 33>,
 }
 
 /// Sv39 Physical Address
 #[derive(Csr)]
 pub struct PAddr39 {
     page_offset: BitField<Hex, 0, 11>,
-    ppn0: BitField<Ppn<39>, 12, 55>,
+    ppn: BitField<Ppn<39>, 12, 55>,
 }
 
 /// Sv48 Physical Address
 #[derive(Csr)]
 pub struct PAddr48 {
     page_offset: BitField<Hex, 0, 11>,
-    ppn0: BitField<Ppn<48>, 12, 55>,
+    ppn: BitField<Ppn<48>, 12, 55>,
 }
 
 /// Sv57 Physical Address
 #[derive(Csr)]
 pub struct PAddr57 {
     page_offset: BitField<Hex, 0, 11>,
-    ppn0: BitField<Ppn<57>, 12, 55>,
+    ppn: BitField<Ppn<57>, 12, 55>,
 }
 
 /// Sv32 Page Table Entry
