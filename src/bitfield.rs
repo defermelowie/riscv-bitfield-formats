@@ -1,5 +1,5 @@
 //! Defines a generic Bitfield struct as well as types for formatting
-use std::{fmt::Display, mem::size_of, marker::PhantomData};
+use std::{fmt::Display, marker::PhantomData, mem::size_of};
 
 /// Binary
 pub struct Bin;
@@ -90,6 +90,58 @@ impl BitFieldType for Atp {
         }
     }
 }
+/// Pysical page number
+pub struct Ppn<const ATP: usize>;
+impl BitFieldType for Ppn<32> {
+    /// Decode address translation mode
+    fn decode(value: u64, _size: usize) -> String {
+        format!(
+            "0x{:x} 0x{:x} -> 0x{:x}",
+            get_bits(value, 10, 21),
+            get_bits(value, 0, 9),
+            value << 12
+        )
+    }
+}
+impl BitFieldType for Ppn<39> {
+    /// Decode address translation mode
+    fn decode(value: u64, _size: usize) -> String {
+        format!(
+            "0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",
+            get_bits(value, 18, 43),
+            get_bits(value, 9, 17),
+            get_bits(value, 0, 8),
+            value << 12
+        )
+    }
+}
+impl BitFieldType for Ppn<48> {
+    /// Decode address translation mode
+    fn decode(value: u64, _size: usize) -> String {
+        format!(
+            "0x{:x} 0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",
+            get_bits(value, 27, 43),
+            get_bits(value, 18, 26),
+            get_bits(value, 9, 17),
+            get_bits(value, 0, 8),
+            value << 12
+        )
+    }
+}
+impl BitFieldType for Ppn<57> {
+    /// Decode address translation mode
+    fn decode(value: u64, _size: usize) -> String {
+        format!(
+            "0x{:x} 0x{:x} 0x{:x} 0x{:x} 0x{:x} -> 0x{:x}",
+            get_bits(value, 36, 43),
+            get_bits(value, 27, 35),
+            get_bits(value, 18, 26),
+            get_bits(value, 9, 17),
+            get_bits(value, 0, 8),
+            value << 12
+        )
+    }
+}
 /// Trap vector mode
 pub struct Tvec;
 impl BitFieldType for Tvec {
@@ -140,7 +192,7 @@ impl BitFieldType for ExcCode {
             (0b0, 21) => "Load guest-page fault".into(),
             (0b0, 22) => "Virtual instruction".into(),
             (0b0, 23) => "Store/AMO guest-page fault".into(),
-            _ => format!("\x1b[33mUnknown exception code ({})\x1b[0m", code)
+            _ => format!("\x1b[33mUnknown exception code ({})\x1b[0m", code),
         }
     }
 }
@@ -201,8 +253,7 @@ where
     }
 }
 
-impl<T: BitFieldType, const S: usize, const E: usize> Display for BitField<T, S, E>
-{
+impl<T: BitFieldType, const S: usize, const E: usize> Display for BitField<T, S, E> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", T::decode(self.value(), Self::size()))
     }

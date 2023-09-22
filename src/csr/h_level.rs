@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use super::Csr;
 use crate::bitfield::BitField;
-use crate::bitfield::{Arch, Bin, Hex, Atp};
+use crate::bitfield::{Arch, Atp, Bin, Hex};
 
 /// Hypervisor Status Register
 #[derive(Csr)]
@@ -101,7 +101,7 @@ pub struct Htinst {
     inst: BitField<Hex, 0, 63>,
 }
 
-/// Hypervisor Environment Configuration Register 
+/// Hypervisor Environment Configuration Register
 #[derive(Csr)]
 pub struct Henvcfg {
     stce: BitField<Bin, 63, 63>,

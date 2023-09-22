@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, Data, DeriveInput, DataStruct, Fields};
 use quote::quote;
+use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields};
 
 #[proc_macro_derive(Csr)]
 pub fn csr(input: TokenStream) -> TokenStream {
@@ -12,10 +12,18 @@ fn impl_csr_macro(ast: &DeriveInput) -> TokenStream {
     // Rust source identifiers
     let struct_name = &ast.ident;
     let fields = match &ast.data {
-        Data::Struct(DataStruct {fields: Fields::Named(fields), .. }) => &fields.named,
+        Data::Struct(DataStruct {
+            fields: Fields::Named(fields),
+            ..
+        }) => &fields.named,
         _ => panic!("expected struct with named fields"),
     };
-    let field_name = fields.iter().map(|field| field.ident.clone().expect("expected struct with named fields"));
+    let field_name = fields.iter().map(|field| {
+        field
+            .ident
+            .clone()
+            .expect("expected struct with named fields")
+    });
 
     // Identifiers for printing
     let name_str = format!("{}", struct_name).to_lowercase();
@@ -24,7 +32,7 @@ fn impl_csr_macro(ast: &DeriveInput) -> TokenStream {
     let field_fstr = field_name.clone().map(|field| format!("{}: {{}}", field));
 
     // Generate code
-    let gen = quote!{
+    let gen = quote! {
         impl Display for #struct_name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 writeln!(f, #name_str)?;
@@ -44,8 +52,8 @@ fn impl_csr_macro(ast: &DeriveInput) -> TokenStream {
                     )*
                 }
             }
-        
-            fn name(&self) -> String {
+
+            fn name() -> String {
                 "#name_p".into()
             }
         }

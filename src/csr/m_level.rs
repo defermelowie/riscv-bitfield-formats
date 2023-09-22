@@ -4,8 +4,7 @@ use std::fmt::Display;
 
 use super::Csr;
 use crate::bitfield::BitField;
-use crate::bitfield::{Arch, Bin, Hex, Priv, Atp, Tvec};
-
+use crate::bitfield::{Arch, Bin, Hex, Priv, Tvec};
 
 /// Machine ISA Register
 #[derive(Csr)]
@@ -46,7 +45,6 @@ pub struct Mvendorid {
     bank: BitField<Hex, 7, 31>,
 }
 
-
 /// Machine Architecture ID Register
 #[derive(Csr)]
 pub struct Marchid {
@@ -59,13 +57,11 @@ pub struct Mimpid {
     id: BitField<Hex, 0, 63>,
 }
 
-
 /// Hart ID Register                         
 #[derive(Csr)]
 pub struct Mhartid {
     id: BitField<Hex, 0, 63>,
 }
-
 
 /// Machine Status Register                  
 #[derive(Csr)]
@@ -94,7 +90,6 @@ pub struct Mstatus {
     mpv: BitField<Bin, 39, 39>,
     sd: BitField<Bin, 63, 63>,
 }
-
 
 /// Machine Trap-Vector Base-Address Register
 #[derive(Csr)]

@@ -3,8 +3,8 @@ use csr_macro::Csr;
 use std::fmt::Display;
 
 use super::Csr;
-use crate::bitfield::{BitField, Bool};
-use crate::bitfield::{Arch, Atp, Bin, Hex, Priv, ExcCode, Tvec};
+use crate::bitfield::BitField;
+use crate::bitfield::{Arch, Atp, Bin, Bool, ExcCode, Hex, Priv, Tvec};
 
 /// Supervisor Status Register
 #[derive(Csr)]
