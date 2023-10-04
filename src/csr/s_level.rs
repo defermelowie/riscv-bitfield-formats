@@ -46,12 +46,6 @@ pub struct Senvcfg {
     cbcfe: BitField<Bin, 7, 7>,
 }
 
-/// Supervisor Trap Value Register
-#[derive(Csr)]
-pub struct Stval {
-    stval: BitField<Hex, 0, 63>,
-}
-
 /// Supervisor Address Translation and Protection Register
 #[derive(Csr)]
 pub struct Satp {

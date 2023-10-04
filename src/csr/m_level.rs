@@ -3,7 +3,7 @@ use csr_macro::Csr;
 use std::fmt::Display;
 
 use super::Csr;
-use crate::bitfield::BitField;
+use crate::bitfield::{BitField, RSh};
 use crate::bitfield::{Arch, Bin, Hex, Priv, Tvec};
 
 /// Machine ISA Register
@@ -122,8 +122,19 @@ pub struct Medeleg {
     store_guest_page_fault: BitField<Bin, 0x17, 0x17>,
 }
 
-/// TODO: reuse register structs and define views
+/// Machine Trap Value Register
+#[derive(Csr)]
+pub struct Mtval {
+    tval: BitField<Hex, 0, 63>,
+}
 
+/// Machine Trap Value Register
+#[derive(Csr)]
+pub struct Mtval2 {
+    tval: BitField<RSh<2,Hex>, 0, 63>,
+}
+
+// TODO: reuse register structs and define views
 /// Machine Interrupt Delegation Register
 #[derive(Csr)]
 pub struct Mideleg {

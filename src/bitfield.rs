@@ -75,7 +75,6 @@ impl BitFieldType for Priv {
 /// Address translation & protection mode
 pub struct Atp;
 impl BitFieldType for Atp {
-    /// Decode address translation mode
     fn decode(value: u64, _size: usize) -> String {
         match value {
             0x0 => "Bare".into(),
@@ -194,9 +193,9 @@ impl BitFieldType for ExcCode {
 }
 /// Value shifted right by N bits
 ///
-/// _Shifts back left by N bits during decode
-pub struct RSh<const N: u64, T>(PhantomData<T>);
-impl<const N: u64, T> BitFieldType for RSh<N, T>
+/// _Shifts back left by N bits during decode_
+pub struct RSh<const N: usize, T>(PhantomData<T>);
+impl<const N: usize, T> BitFieldType for RSh<N, T>
 where
     T: BitFieldType,
 {

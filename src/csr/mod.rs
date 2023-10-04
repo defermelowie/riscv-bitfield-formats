@@ -35,7 +35,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x140" | "sscratch" => Ok(Box::new(Sscratch::new(value))),
         "0x141" | "sepc" => Ok(Box::new(Sepc::new(value))),
         "0x142" | "scause" => Ok(Box::new(Scause::new(value))),
-        "0x143" | "stval" => Ok(Box::new(Stval::new(value))),
+        "0x143" | "stval" => Ok(Box::new(Mtval::new(value))),
         "0x144" | "sip" => Ok(Box::new(Sip::new(value))),
         // Supervisor Protection and Translation
         "0x180" | "satp" => Ok(Box::new(Satp::new(value))),
@@ -90,10 +90,10 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x340" | "mscratch" => Err(CsrError::Unsupported(name.into())),
         "0x341" | "mepc" => Err(CsrError::Unsupported(name.into())),
         "0x342" | "mcause" => Err(CsrError::Unsupported(name.into())),
-        "0x343" | "mtval" => Err(CsrError::Unsupported(name.into())),
+        "0x343" | "mtval" => Ok(Box::new(Mtval::new(value))),
         "0x344" | "mip" => Ok(Box::new(Mip::new(value))),
         "0x34a" | "mtinst" => Err(CsrError::Unsupported(name.into())),
-        "0x34b" | "mtval2" => Err(CsrError::Unsupported(name.into())),
+        "0x34b" | "mtval2" => Ok(Box::new(Mtval2::new(value))),
         // Machine Configuration
         "0x30a" | "menvcfg" => Err(CsrError::Unsupported(name.into())),
         "0x747" | "mseccfg" => Err(CsrError::Unsupported(name.into())),
