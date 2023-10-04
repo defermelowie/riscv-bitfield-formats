@@ -90,17 +90,6 @@ impl BitFieldType for Atp {
         }
     }
 }
-/// Virtual page number
-pub struct Vpn;
-impl BitFieldType for Vpn{
-    fn decode(value: u64, size: usize) -> String {
-        match size {
-            10 => format!("0x{:x} -> 0x{:x}", value, value << 2), // sizeof(vpn[i]) = 10 => RV32 => sizeof(pte) = 2**2 bytes
-            9 => format!("0x{:x} -> 0x{:x}", value, value << 3),  // sizeof(vpn[i]) = 9 => RV64 => sizeof(pte) = 2**3 bytes
-            _ => format!("0x{:x} - \x1b[33mUnknown architecture\x1b[0m", value),
-        }
-    }
-}
 /// Pysical page number
 pub struct Ppn<const ATP: usize>;
 impl BitFieldType for Ppn<32> {
@@ -201,6 +190,22 @@ impl BitFieldType for ExcCode {
             (0b0, 23) => "Store/AMO guest-page fault".into(),
             _ => format!("\x1b[33mUnknown exception code ({})\x1b[0m", code),
         }
+    }
+}
+/// Value shifted right by N bits
+///
+/// _Shifts back left by N bits during decode
+pub struct RSh<const N: u64, T>(PhantomData<T>);
+impl<const N: u64, T> BitFieldType for RSh<N, T>
+where
+    T: BitFieldType,
+{
+    fn decode(value: u64, size: usize) -> String {
+        format!(
+            "{} -> {}",
+            T::decode(value, size),
+            T::decode(value << N, size)
+        )
     }
 }
 
