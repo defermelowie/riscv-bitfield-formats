@@ -3,8 +3,8 @@ use csr_macro::Csr;
 use std::fmt::Display;
 
 use super::Csr;
-use crate::bitfield::BitField;
-use crate::bitfield::{Arch, Atp, Bin, Bool, ExcCode, Hex, Priv, Tvec};
+use crate::bitfield::{BitField};
+use crate::bitfield::{Arch, Atp, Bin, Bool, RSh, ExcCode, Hex, Priv, Tvec};
 
 /// Supervisor Status Register
 #[derive(Csr)]
@@ -51,7 +51,7 @@ pub struct Senvcfg {
 pub struct Satp {
     mode: BitField<Atp, 60, 63>,
     asid: BitField<Hex, 44, 59>,
-    ppn: BitField<Hex, 0, 43>,
+    ppn: BitField<RSh<12, Hex>, 0, 43>,
 }
 
 /// Supervisor Trap Vector Base Address Register
