@@ -280,8 +280,7 @@ where
     assert!(lastbit >= index);
 
     let value = value << (lastbit - index);
-    let value = value >> (lastbit);
-    value
+    value >> (lastbit)
 }
 
 /// Get the bits between 2 specified indices
@@ -295,8 +294,7 @@ where
     assert!(end >= start);
 
     let value = value << (lastbit - end);
-    let value = value >> (lastbit - end + start);
-    value
+    value >> (lastbit - end + start)
 }
 
 #[cfg(test)]
