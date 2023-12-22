@@ -77,7 +77,8 @@ pub struct Sepc {
 #[derive(Csr)]
 pub struct Scause {
     interrupt: BitField<Bool, 63, 63>,
-    // FIXME: exeption code is scause[0,62] but for formatting purposes, the interrupt flag (scause[63]) is included into this bitfield as well
+    /* Note: exeption code is scause[0,62] but for formatting purposes, the interrupt 
+             flag (scause[63]) is included into this bitfield as well */
     code: BitField<ExcCode, 0, 63>,
 }
 

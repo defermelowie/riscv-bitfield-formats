@@ -134,7 +134,6 @@ pub struct Mtval2 {
     tval: BitField<RSh<2,Hex>, 0, 63>,
 }
 
-// TODO: reuse register structs and define views
 /// Machine Interrupt Delegation Register
 #[derive(Csr)]
 pub struct Mideleg {

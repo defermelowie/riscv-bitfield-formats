@@ -1,5 +1,5 @@
 //! Defines a generic Bitfield struct as well as types for formatting
-use std::{fmt::Display, marker::PhantomData, mem::size_of};
+use std::{fmt::{Display, format}, marker::PhantomData, mem::size_of};
 
 /// Binary
 pub struct Bin;
@@ -35,17 +35,17 @@ impl BitFieldType for Dec {
         format!("{}", value)
     }
 }
-/// TODO: Reserved
-// pub struct Reserved<const VAL: usize>;
-// impl BitFieldType for Reserved<> {
-//     fn decode(value: u64, _size: usize) -> String {
-//         if value != Self::VAL {
-//             format!("\x1b[33mField has invallid value (0x{:x})\x1b[0m", value)
-//         } else {
-//             value.into()
-//         }
-//     }
-// }
+/// Reserved with some value
+pub struct Reserved<const VAL: u64>;
+impl<const V: u64> BitFieldType for Reserved<V> {
+    fn decode(value: u64, _size: usize) -> String {
+        if value != V {
+            format!("\x1b[33mInvalid (0x{:x})\x1b[0m", value)
+        } else {
+            format!("0x{:x}", value)
+        }
+    }
+}
 /// Architecture
 pub struct Arch;
 impl BitFieldType for Arch {
@@ -188,6 +188,36 @@ impl BitFieldType for ExcCode {
             (0b0, 22) => "Virtual instruction".into(),
             (0b0, 23) => "Store/AMO guest-page fault".into(),
             _ => format!("\x1b[33mUnknown exception code ({})\x1b[0m", code),
+        }
+    }
+}
+/// PMP configuration byte
+pub struct PmpXCfg;
+impl BitFieldType for PmpXCfg {
+    fn decode(value: u64, size: usize) -> String {
+        // Get fields
+        let r: bool = (value & 0b0000_0001) != 0;
+        let w: bool = (value & 0b0000_0010) != 0;
+        let x: bool = (value & 0b0000_0100) != 0;
+        let l: bool = (value & 0b1000_0000) != 0;
+        let a = match (value >> 3) & 0b11 {
+            0b00 => "OFF",
+            0b01 => "TOR",
+            0b10 => "NA4",
+            0b11 => "NAPOT",
+            _ => panic!(), // Should never occur given the mask above
+        };
+        // Build formatted string
+        let mut s = String::new();
+        s += if r {"R"} else {"\x1b[90mR\x1b[0m"};
+        s += if w {"W"} else {"\x1b[90mW\x1b[0m"};
+        s += if x {"X"} else {"\x1b[90mX\x1b[0m"};
+        let mut s = format!("{} {} ", s, a);
+        s += if l {"Locked"} else {""};
+        // Return error string if invalid permission bit combination
+        match (r, w, x) {
+            (false, true, _) => format!("\x1b[33mIllegal PMP permissions:\x1b[0m {}", s),
+            (_, _, _) => s,
         }
     }
 }
