@@ -5,3 +5,7 @@
 > A tool for printing out RISC-V bitfield values (such as CSRs) in a human readable format
 
 **This is currently a work in progress without priority**
+
+## Demo
+
+![Demo](doc/demo.gif)
