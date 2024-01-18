@@ -1,6 +1,6 @@
 # RISC-V CSR tool
 
-[![Rust](https://github.com/defermelowie/riscv-csrtool/actions/workflows/rust.yml/badge.svg)](https://github.com/defermelowie/riscv-csrtool/actions/workflows/rust.yml)
+[![Rust](https://github.com/defermelowie/riscv-csrtool/actions/workflows/run-tests.yml/badge.svg)](https://github.com/defermelowie/riscv-csrtool/actions/workflows/run-tests.yml)
 
 > A tool for printing out RISC-V bitfield values (such as CSRs) in a human readable format
 
