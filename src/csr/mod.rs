@@ -14,7 +14,6 @@ pub use vmem::*;
 mod pmp;
 pub use pmp::*;
 
-
 /// Get a csr from a name/address and value
 pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
     match &*name.to_lowercase() {
@@ -102,7 +101,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         "0x747" | "mseccfg" => Err(CsrError::Unsupported(name.into())),
         // Physical memory protection
         "pmpaddr" => Ok(Box::new(PmpAddr::new(value))),
-        "pmpcfg"  => Ok(Box::new(PmpCfg::new(value))),
+        "pmpcfg" => Ok(Box::new(PmpCfg::new(value))),
         // Machine Non-Maskable Interrupt Handling
         "0x740" | "mnscratch" => Err(CsrError::Unsupported(name.into())),
         "0x741" | "mnepc" => Err(CsrError::Unsupported(name.into())),

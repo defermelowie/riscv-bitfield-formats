@@ -3,8 +3,8 @@ use csr_macro::Csr;
 use std::fmt::Display;
 
 use super::Csr;
-use crate::bitfield::{BitField};
-use crate::bitfield::{Arch, Atp, Bin, Bool, RSh, ExcCode, Hex, Priv, Tvec};
+use crate::bitfield::BitField;
+use crate::bitfield::{Arch, Atp, Bin, Bool, ExcCode, Hex, Priv, RSh, Tvec};
 
 /// Supervisor Status Register
 #[derive(Csr)]
@@ -77,8 +77,8 @@ pub struct Sepc {
 #[derive(Csr)]
 pub struct Scause {
     interrupt: BitField<Bool, 63, 63>,
-    /* Note: exeption code is scause[0,62] but for formatting purposes, the interrupt 
-             flag (scause[63]) is included into this bitfield as well */
+    /* Note: exeption code is scause[0,62] but for formatting purposes, the interrupt
+    flag (scause[63]) is included into this bitfield as well */
     code: BitField<ExcCode, 0, 63>,
 }
 
