@@ -1,5 +1,5 @@
 //! Defines a generic Bitfield struct as well as types for formatting
-use std::{fmt::{Display, format}, marker::PhantomData, mem::size_of};
+use std::{fmt::Display, marker::PhantomData, mem::size_of};
 
 /// Binary
 pub struct Bin;
@@ -198,11 +198,11 @@ impl BitFieldType for PmpXCfg {
         };
         // Build formatted string
         let mut s = String::new();
-        s += if r {"R"} else {"\x1b[90mR\x1b[0m"};
-        s += if w {"W"} else {"\x1b[90mW\x1b[0m"};
-        s += if x {"X"} else {"\x1b[90mX\x1b[0m"};
+        s += if r { "R" } else { "\x1b[90mR\x1b[0m" };
+        s += if w { "W" } else { "\x1b[90mW\x1b[0m" };
+        s += if x { "X" } else { "\x1b[90mX\x1b[0m" };
         let mut s = format!("{} {} ", s, a);
-        s += if l {"Locked"} else {""};
+        s += if l { "Locked" } else { "" };
         // Return error string if invalid permission bit combination
         match (r, w, x) {
             (false, true, _) => format!("\x1b[33mIllegal PMP permissions:\x1b[0m {}", s),
@@ -212,7 +212,7 @@ impl BitFieldType for PmpXCfg {
 }
 /// Reserved with some value
 pub struct Reserved<const VAL: u64, T>(PhantomData<T>);
-impl<const V: u64, T> BitFieldType for Reserved<V, T> 
+impl<const V: u64, T> BitFieldType for Reserved<V, T>
 where
     T: BitFieldType,
 {
@@ -220,7 +220,7 @@ where
         if value != V {
             format!("\x1b[33mInvalid ({})\x1b[0m", T::decode(value, size))
         } else {
-            format!("{}", T::decode(value, size))
+            T::decode(value, size)
         }
     }
 }
@@ -259,7 +259,10 @@ impl<T, const S: usize, const E: usize> BitField<T, S, E> {
     /// Create a new bitfield from a raw value
     ///
     /// Value is taken from bits `START` to `END`
-    pub fn new(value: u64) -> Self {
+    pub fn new<I>(value: I) -> Self
+    where
+        I: Into<u64>,
+    {
         assert!(S <= E);
         if Self::size() == 1 {
             BitField(get_bit(value.into(), S), PhantomData)
@@ -293,7 +296,7 @@ where
 {
     /// Converts any integer value into a bitfield
     fn from(value: I) -> Self {
-        BitField::new(value.into())
+        BitField::new(value)
     }
 }
 
@@ -337,7 +340,7 @@ mod test {
     #[test]
     #[should_panic]
     fn bitfield_start_after_end_panics() {
-        let _: BitField<Bin, 7, 4> = BitField::new(3);
+        let _: BitField<Bin, 7, 4> = BitField::new(3 as u64);
     }
 
     #[test]
@@ -355,7 +358,7 @@ mod test {
 
     #[test]
     fn bitfield_format_bin() {
-        let b = BitField::<Bin, 0, 5>::new(0x5);
+        let b = BitField::<Bin, 0, 5>::new(0x5 as u64);
         let s = format!("{}", b);
         assert_eq!(s, "0b000101");
     }
