@@ -134,47 +134,27 @@ pub struct Mtval2 {
     tval: BitField<RSh<2,Hex>, 0, 63>,
 }
 
-/// Machine Interrupt Delegation Register
+/// Machine Interrupt Bitmap
 #[derive(Csr)]
-pub struct Mideleg {
-    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
-    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
-    machine_sw_interrupt: BitField<Bin, 3, 3>,
-    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
-    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
-    machine_timer_interrupt: BitField<Bin, 7, 7>,
-    supervisor_external_interrupt: BitField<Bin, 9, 9>,
-    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
-    machine_external_interrupt: BitField<Bin, 11, 11>,
-    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
+pub struct Minterrupts {
+    s_software_i: BitField<Bin, 1, 1>,
+    vs_software_i: BitField<Bin, 2, 2>,
+    m_software_i: BitField<Bin, 3, 3>,
+    s_timer_i: BitField<Bin, 5, 5>,
+    vs_timer_i: BitField<Bin, 6, 6>,
+    m_timer_i: BitField<Bin, 7, 7>,
+    s_external_i: BitField<Bin, 9, 9>,
+    vs_external_i: BitField<Bin, 10, 10>,
+    m_external_i: BitField<Bin, 11, 11>,
+    sg_external_i: BitField<Bin, 12, 12>,
+    custom_i: BitField<Hex, 16, 63>,
 }
+
+/// Machine Interrupt Delegation Register
+pub type Mideleg = Minterrupts;
 
 /// Machine Interrupt Enable Register
-#[derive(Csr)]
-pub struct Mie {
-    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
-    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
-    machine_sw_interrupt: BitField<Bin, 3, 3>,
-    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
-    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
-    machine_timer_interrupt: BitField<Bin, 7, 7>,
-    supervisor_external_interrupt: BitField<Bin, 9, 9>,
-    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
-    machine_external_interrupt: BitField<Bin, 11, 11>,
-    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
-}
+pub type Mie = Minterrupts;
 
 /// Machine Interrupt Pending Register
-#[derive(Csr)]
-pub struct Mip {
-    supervisor_sw_interrupt: BitField<Bin, 1, 1>,
-    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
-    machine_sw_interrupt: BitField<Bin, 3, 3>,
-    supervisor_timer_interrupt: BitField<Bin, 5, 5>,
-    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
-    machine_timer_interrupt: BitField<Bin, 7, 7>,
-    supervisor_external_interrupt: BitField<Bin, 9, 9>,
-    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
-    machine_external_interrupt: BitField<Bin, 11, 11>,
-    supervisor_guest_external_interrupt: BitField<Bin, 12, 12>,
-}
+pub type Mip = Minterrupts;

@@ -47,7 +47,7 @@ pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
         // Hypervisor Trap Setup
         "0x600" | "hstatus" => Ok(Box::new(Hstatus::new(value))),
         "0x602" | "hedeleg" => Ok(Box::new(Hedeleg::new(value))),
-        "0x603" | "hideleg" => Err(CsrError::Unsupported(name.into())),
+        "0x603" | "hideleg" => Ok(Box::new(Hideleg::new(value))),
         "0x604" | "hie" => Err(CsrError::Unsupported(name.into())),
         "0x606" | "hcounteren" => Ok(Box::new(Hcounteren::new(value))),
         "0x607" | "hgeie" => Err(CsrError::Unsupported(name.into())),

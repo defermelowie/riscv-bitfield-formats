@@ -35,17 +35,6 @@ impl BitFieldType for Dec {
         format!("{}", value)
     }
 }
-/// Reserved with some value
-pub struct Reserved<const VAL: u64>;
-impl<const V: u64> BitFieldType for Reserved<V> {
-    fn decode(value: u64, _size: usize) -> String {
-        if value != V {
-            format!("\x1b[33mInvalid (0x{:x})\x1b[0m", value)
-        } else {
-            format!("0x{:x}", value)
-        }
-    }
-}
 /// Architecture
 pub struct Arch;
 impl BitFieldType for Arch {
@@ -194,7 +183,7 @@ impl BitFieldType for ExcCode {
 /// PMP configuration byte
 pub struct PmpXCfg;
 impl BitFieldType for PmpXCfg {
-    fn decode(value: u64, size: usize) -> String {
+    fn decode(value: u64, _size: usize) -> String {
         // Get fields
         let r: bool = (value & 0b0000_0001) != 0;
         let w: bool = (value & 0b0000_0010) != 0;
@@ -205,7 +194,7 @@ impl BitFieldType for PmpXCfg {
             0b01 => "TOR",
             0b10 => "NA4",
             0b11 => "NAPOT",
-            _ => panic!(), // Should never occur given the mask above
+            _ => unreachable!(), // Should never occur given the mask above
         };
         // Build formatted string
         let mut s = String::new();
@@ -218,6 +207,20 @@ impl BitFieldType for PmpXCfg {
         match (r, w, x) {
             (false, true, _) => format!("\x1b[33mIllegal PMP permissions:\x1b[0m {}", s),
             (_, _, _) => s,
+        }
+    }
+}
+/// Reserved with some value
+pub struct Reserved<const VAL: u64, T>(PhantomData<T>);
+impl<const V: u64, T> BitFieldType for Reserved<V, T> 
+where
+    T: BitFieldType,
+{
+    fn decode(value: u64, size: usize) -> String {
+        if value != V {
+            format!("\x1b[33mInvalid ({})\x1b[0m", T::decode(value, size))
+        } else {
+            format!("{}", T::decode(value, size))
         }
     }
 }

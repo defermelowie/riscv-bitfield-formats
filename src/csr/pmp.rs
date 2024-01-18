@@ -8,7 +8,7 @@ use crate::bitfield::{Hex, PmpXCfg, RSh, Reserved};
 /// Physical memory protection address register
 #[derive(Csr)]
 pub struct PmpAddr {
-    reserved: BitField<Reserved<0>, 54, 63>,
+    reserved: BitField<Reserved<0, Hex>, 54, 63>,
     address: BitField<RSh<2, Hex>, 0, 53>,
 }
 

@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use super::Csr;
 use crate::bitfield::BitField;
-use crate::bitfield::{Arch, Atp, Bin, Hex};
+use crate::bitfield::{Arch, Atp, Bin, Hex, Reserved};
 
 /// Hypervisor Status Register
 #[derive(Csr)]
@@ -48,8 +48,17 @@ pub struct Hedeleg {
 /// Hypervisor Interrupt Delegation Register
 #[derive(Csr)]
 pub struct Hideleg {
-    // Fixme: Create a bitfield per delegated interrupt
-    hideleg: BitField<Bin, 0, 63>,
+    supervisor_sw_interrupt: BitField<Reserved<0, Bin>, 1, 1>,
+    virtual_supervisor_sw_interrupt: BitField<Bin, 2, 2>,
+    machine_sw_interrupt: BitField<Bin, 3, 3>,
+    supervisor_timer_interrupt: BitField<Reserved<0, Bin>, 5, 5>,
+    virtual_supervisor_timer_interrupt: BitField<Bin, 6, 6>,
+    machine_timer_interrupt: BitField<Bin, 7, 7>,
+    supervisor_external_interrupt: BitField<Reserved<0, Bin>, 9, 9>,
+    virtual_supervisor_external_interrupt: BitField<Bin, 10, 10>,
+    machine_external_interrupt: BitField<Bin, 11, 11>,
+    supervisor_guest_external_interrupt: BitField<Reserved<0, Bin>, 12, 12>,
+    custom: BitField<Hex, 16, 63>,
 }
 
 /// Hypervisor Counter Enable Register
