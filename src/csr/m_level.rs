@@ -3,8 +3,8 @@ use csr_macro::Csr;
 use std::fmt::Display;
 
 use super::Csr;
-use crate::bitfield::{BitField, RSh};
 use crate::bitfield::{Arch, Bin, Hex, Priv, Tvec};
+use crate::bitfield::{BitField, RSh};
 
 /// Machine ISA Register
 #[derive(Csr)]
@@ -131,7 +131,7 @@ pub struct Mtval {
 /// Machine Trap Value Register
 #[derive(Csr)]
 pub struct Mtval2 {
-    tval: BitField<RSh<2,Hex>, 0, 63>,
+    tval: BitField<RSh<2, Hex>, 0, 63>,
 }
 
 /// Machine Interrupt Bitmap
