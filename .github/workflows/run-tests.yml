@@ -1,4 +1,4 @@
-name: Build using cargo
+name: Run tests using cargo
 
 on:
   push:
