@@ -26,6 +26,9 @@ jobs:
         with:
             submodules: true
 
+      - name: Install python dependency
+        uses: actions/setup-python@v4
+
       - name: Build
         run: cargo build
 
