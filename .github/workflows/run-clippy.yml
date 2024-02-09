@@ -11,7 +11,7 @@ name: Analyze using clippy
 
 on:
   push:
-    branches: ["main", "wip"]
+    branches: ["main"]
   pull_request:
     branches: ["main"]
 
