@@ -7,7 +7,7 @@ const OPCODES: &str = "res/opcodes";
 ///
 fn main() {
     // Only rerun if opcode submodule changes
-    println!("cargo:rerun-if-changed={OPCODES}");
+    println!("cargo:rerun-if-changed={OPCODES}/*");
     // Create inst.rs
     Command::new("python3")
         .current_dir(OPCODES)
