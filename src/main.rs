@@ -27,23 +27,39 @@ fn main() -> ! {
 
     // Try to format as instruction
     if let "ins" | "inst" | "instr" = cli.name.as_str() {
-        todo!("Format instructions")
-        // let inst = inst::format(cli.value);
-        // print!("{}", inst);
-        // exit(0)
+        match inst::format_instr(cli.value) {
+            Ok(i) => {
+                print!("{}", i);
+                exit(0)
+            }
+            Err(e) => {
+                // Output error if instruction formatting failed
+                eprint!("\x1b[31m\x1b[1m");
+                eprintln!("Formatting failed: {}", e);
+                eprint!("\x1b[0m");
+                exit(-1)
+            }
+        }
+    }
+
+    // Try instruction related formats
+    let inst = inst::format(&cli.name, cli.value);
+    if let Ok(i) = inst {
+        print!("{}", i);
+        exit(0)
     }
 
     // Try to format as CSR
     let csr = csr::format(&cli.name, cli.value);
-    if let Ok(csr) = csr {
-        print!("{}", csr);
+    if let Ok(r) = csr {
+        print!("{}", r);
         exit(0)
     }
 
     // Try to format virtual memory related
     let vmem = vmem::format(&cli.name, cli.value);
-    if let Ok(vmem) = vmem {
-        print!("{}", vmem);
+    if let Ok(m) = vmem {
+        print!("{}", m);
         exit(0)
     }
 

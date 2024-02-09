@@ -4,7 +4,7 @@
 
 use thiserror::Error;
 
-use crate::{csr, format::Csr};
+use crate::format::Csr;
 
 // Export vmem formats
 mod va;

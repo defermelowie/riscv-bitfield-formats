@@ -2,7 +2,7 @@
 use csr_macro::Csr;
 use std::fmt::Display;
 
-use super::Csr;
+use crate::format::Csr;
 use crate::bitfield::BitField;
 use crate::bitfield::{Hex, PmpXCfg, RSh, Reserved};
 
