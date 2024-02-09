@@ -14,10 +14,10 @@ fn main() {
         .arg("parse.py")
         .arg("-rust")
         .arg("rv*")
-        .status().unwrap();
+        .status().expect("Failed to create");
     // Copy result to src/encoding.rs
     Command::new("cp")
         .arg(format!("{OPCODES}/inst.rs"))
         .arg("src/encoding.rs")
-        .status().unwrap();
+        .status().expect("Failed to copy");
 }
