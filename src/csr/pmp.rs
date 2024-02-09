@@ -1,3 +1,4 @@
+//! Definitions for CSRs related to physical memory protection
 use csr_macro::Csr;
 use std::fmt::Display;
 

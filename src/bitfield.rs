@@ -1,4 +1,4 @@
-//! Defines a generic Bitfield struct as well as types for formatting
+//! Defines a generic [BitField] struct as well as types for formatting
 use std::{fmt::Display, marker::PhantomData, mem::size_of};
 
 /// Binary

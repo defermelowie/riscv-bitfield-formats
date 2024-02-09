@@ -1,6 +1,7 @@
-use std::fmt::Display;
-
 use thiserror::Error;
+
+use crate::encoding;
+use crate::format::Csr;
 
 // Export CSRs
 mod m_level;
@@ -9,141 +10,124 @@ mod h_level;
 pub use h_level::*;
 mod s_level;
 pub use s_level::*;
-mod vmem;
-pub use vmem::*;
 mod pmp;
 pub use pmp::*;
 
-/// Get a csr from a name/address and value
-pub fn to_csr(name: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
-    match &*name.to_lowercase() {
-        // Unprivileged floating-point
-        "0x001" | "fflags" => Err(CsrError::Unsupported(name.into())),
-        "0x002" | "frm" => Err(CsrError::Unsupported(name.into())),
-        "0x003" | "fcsr" => Err(CsrError::Unsupported(name.into())),
-        // Unprivileged counters & timers
-        "0xc00" | "cycle" => Err(CsrError::Unsupported(name.into())),
-        "0xc01" | "time" => Err(CsrError::Unsupported(name.into())),
-        "0xc02" | "instret" => Err(CsrError::Unsupported(name.into())),
-        "hmpcounter" => Err(CsrError::Unsupported(name.into())),
-        // Supervisor trap setup
-        "0x100" | "sstatus" => Ok(Box::new(Sstatus::new(value))),
-        "0x104" | "sie" => Ok(Box::new(Sie::new(value))),
-        "0x105" | "stvec" => Ok(Box::new(Stvec::new(value))),
-        "0x106" | "scounteren" => Ok(Box::new(Scounteren::new(value))),
-        // Supervisor config
-        "0x10a" | "senvcfg" => Ok(Box::new(Senvcfg::new(value))),
-        // Supervisor trap handling
-        "0x140" | "sscratch" => Ok(Box::new(Sscratch::new(value))),
-        "0x141" | "sepc" => Ok(Box::new(Sepc::new(value))),
-        "0x142" | "scause" => Ok(Box::new(Scause::new(value))),
-        "0x143" | "stval" => Ok(Box::new(Mtval::new(value))),
-        "0x144" | "sip" => Ok(Box::new(Sip::new(value))),
-        // Supervisor Protection and Translation
-        "0x180" | "satp" => Ok(Box::new(Satp::new(value))),
-        // Debug & Trace Registers
-        "0x5a8" | "scontext" => Err(CsrError::Unsupported(name.into())),
-        // Hypervisor Trap Setup
-        "0x600" | "hstatus" => Ok(Box::new(Hstatus::new(value))),
-        "0x602" | "hedeleg" => Ok(Box::new(Hedeleg::new(value))),
-        "0x603" | "hideleg" => Ok(Box::new(Hideleg::new(value))),
-        "0x604" | "hie" => Err(CsrError::Unsupported(name.into())),
-        "0x606" | "hcounteren" => Ok(Box::new(Hcounteren::new(value))),
-        "0x607" | "hgeie" => Err(CsrError::Unsupported(name.into())),
-        // Hypervisor Trap Handling
-        "0x643" | "htval" => Ok(Box::new(Htval::new(value))),
-        "0x644" | "hip" => Err(CsrError::Unsupported(name.into())),
-        "0x645" | "hvip" => Err(CsrError::Unsupported(name.into())),
-        "0x64a" | "htinst" => Err(CsrError::Unsupported(name.into())),
-        "0xe12" | "hgeip" => Err(CsrError::Unsupported(name.into())),
-        // Hypervisor configuration
-        "0x60a" | "henvcfg" => Ok(Box::new(Henvcfg::new(value))),
-        // Hypervisor Protection and Translation
-        "0x680" | "hgatp" => Ok(Box::new(Hgatp::new(value))),
-        // Debug/Trace Registers
-        "0x6a8" | "hcontext" => Err(CsrError::Unsupported(name.into())),
-        // Hypervisor Counter/Timer Virtualization Registers
-        "0x605" | "htimedelta" => Err(CsrError::Unsupported(name.into())),
-        // Virtual Supervisor Registers
-        "0x200" | "vsstatus" => Ok(Box::new(Sstatus::new(value))),
-        "0x204" | "vsie" => Err(CsrError::Unsupported(name.into())),
-        "0x205" | "vstvec" => Ok(Box::new(Stvec::new(value))),
-        "0x240" | "vsscratch" => Ok(Box::new(Sscratch::new(value))),
-        "0x241" | "vsepc" => Ok(Box::new(Sepc::new(value))),
-        "0x242" | "vscause" => Ok(Box::new(Scause::new(value))),
-        "0x243" | "vstval" => Err(CsrError::Unsupported(name.into())),
-        "0x244" | "vsip" => Err(CsrError::Unsupported(name.into())),
-        "0x280" | "vsatp" => Ok(Box::new(Satp::new(value))),
-        // Machine Information Registers
-        "0xf11" | "mvendorid" => Ok(Box::new(Mvendorid::new(value))),
-        "0xf12" | "marchid" => Ok(Box::new(Marchid::new(value))),
-        "0xf13" | "mimpid" => Ok(Box::new(Mimpid::new(value))),
-        "0xf14" | "mhartid" => Ok(Box::new(Mhartid::new(value))),
-        "0xf15" | "mconfigptr" => Err(CsrError::Unsupported(name.into())),
-        // Machine Trap Setup
-        "0x300" | "mstatus" => Ok(Box::new(Mstatus::new(value))),
-        "0x301" | "misa" => Ok(Box::new(Misa::new(value))),
-        "0x302" | "medeleg" => Ok(Box::new(Medeleg::new(value))),
-        "0x303" | "mideleg" => Ok(Box::new(Mideleg::new(value))),
-        "0x304" | "mie" => Ok(Box::new(Mie::new(value))),
-        "0x305" | "mtvec" => Ok(Box::new(Mtvec::new(value))),
-        "0x306" | "mcounteren" => Err(CsrError::Unsupported(name.into())),
-        // Machine Trap Handling
-        "0x340" | "mscratch" => Err(CsrError::Unsupported(name.into())),
-        "0x341" | "mepc" => Err(CsrError::Unsupported(name.into())),
-        "0x342" | "mcause" => Err(CsrError::Unsupported(name.into())),
-        "0x343" | "mtval" => Ok(Box::new(Mtval::new(value))),
-        "0x344" | "mip" => Ok(Box::new(Mip::new(value))),
-        "0x34a" | "mtinst" => Err(CsrError::Unsupported(name.into())),
-        "0x34b" | "mtval2" => Ok(Box::new(Mtval2::new(value))),
-        // Machine Configuration
-        "0x30a" | "menvcfg" => Err(CsrError::Unsupported(name.into())),
-        "0x747" | "mseccfg" => Err(CsrError::Unsupported(name.into())),
-        // Physical memory protection
-        "pmpaddr" => Ok(Box::new(PmpAddr::new(value))),
-        "pmpcfg" => Ok(Box::new(PmpCfg::new(value))),
-        // Machine Non-Maskable Interrupt Handling
-        "0x740" | "mnscratch" => Err(CsrError::Unsupported(name.into())),
-        "0x741" | "mnepc" => Err(CsrError::Unsupported(name.into())),
-        "0x742" | "mncause" => Err(CsrError::Unsupported(name.into())),
-        "0x744" | "mnstatus" => Err(CsrError::Unsupported(name.into())),
-        // NOTE: Not CSRs but still usefull to be able to format
-        "pte_sv32" | "sv32_pte" => Ok(Box::new(Pte32::new(value))),
-        "pte_sv39" | "sv39_pte" => Ok(Box::new(Pte39::new(value))),
-        "pte_sv48" | "sv48_pte" => Ok(Box::new(Pte48::new(value))),
-        "pte_sv57" | "sv57_pte" => Ok(Box::new(Pte57::new(value))),
-        "vaddr_sv32" | "sv32_vaddr" => Ok(Box::new(VAddr32::new(value))),
-        "vaddr_sv39" | "sv39_vaddr" => Ok(Box::new(VAddr39::new(value))),
-        "vaddr_sv48" | "sv48_vaddr" => Ok(Box::new(VAddr48::new(value))),
-        "vaddr_sv57" | "sv57_vaddr" => Ok(Box::new(VAddr57::new(value))),
-        "paddr_sv32" | "sv32_paddr" => Ok(Box::new(PAddr32::new(value))),
-        "paddr_sv39" | "sv39_paddr" => Ok(Box::new(PAddr39::new(value))),
-        "paddr_sv48" | "sv48_paddr" => Ok(Box::new(PAddr48::new(value))),
-        "paddr_sv57" | "sv57_paddr" => Ok(Box::new(PAddr57::new(value))),
-        // Unkown CSR
-        _ => Err(CsrError::Unkown(name.into())),
+/// Represents a CSR address
+type Addr = u16;
+
+/// Errors that may arise when creating/handling a CSR
+#[derive(Error, Debug)]
+pub enum CsrError {
+    #[error("\"{0}\" is not a name of a supported CSR")]
+    UnknownName(String),
+    #[error("0x{0:03x} is not an address of a supported CSR")]
+    UnkownAddr(Addr),
+}
+
+/// Convert a name/address string to a valid [Addr]
+fn addr(csr_str: &str) -> Result<Addr, CsrError> {
+    if let Some(addr_str) = csr_str.strip_prefix("0x") {
+        let a = Addr::from_str_radix(addr_str, 16);
+        Ok(a.expect("A 0x prefixed string should be a valid hexadecimal number"))
+    } else if let Some(addr_str) = csr_str.strip_prefix("0b") {
+        let a = Addr::from_str_radix(addr_str, 2);
+        Ok(a.expect("A 0b prefixed string should be a valid binary number"))
+    } else if let Ok(a) = Addr::from_str_radix(csr_str, 10) {
+        Ok(a)
+    } else if let Some(a) = encoding::csr_address_map(csr_str) {
+        Ok(a)
+    } else {
+        Err(CsrError::UnknownName(csr_str.to_string()))
     }
 }
 
-pub trait Csr
-where
-    Self: Display,
-{
-    /// Create a new CSR instance from a value
-    fn new(value: u64) -> Self
-    where
-        Self: Sized;
-
-    /// Get CSR's name
-    fn name() -> String
-    where
-        Self: Sized;
-}
-
-#[derive(Error, Debug)]
-pub enum CsrError {
-    #[error("\x1b[31m\x1b[1mERROR: \"{0}\" is not known\x1b[0m")]
-    Unkown(String),
-    #[error("\x1b[33m\x1b[1mWARNING: \"{0}\" is not (yet) supported\x1b[0m")]
-    Unsupported(String),
+/// Build a CSR [Format] from an address and value
+pub fn format(csr_str: &str, value: u64) -> Result<Box<dyn Csr>, CsrError> {
+    let address = match addr(csr_str) {
+        Ok(a) => a,
+        Err(e) => return Err(e),
+    };
+    match address {
+        // Unprivileged counters & timers
+        encoding::CSR_CYCLE => todo!("Add cycle format"),
+        encoding::CSR_TIME => todo!("Add time format"),
+        encoding::CSR_INSTRET => todo!("Add instret format"),
+        encoding::CSR_HPMCOUNTER3..=encoding::CSR_HPMCOUNTER31 => {
+            todo!("Add hpmcounter format")
+        }
+        // Supervisor trap setup
+        encoding::CSR_SSTATUS => Ok(Box::new(Sstatus::new(value))),
+        encoding::CSR_SIE => Ok(Box::new(Sie::new(value))),
+        encoding::CSR_STVEC => Ok(Box::new(Stvec::new(value))),
+        encoding::CSR_SCOUNTEREN => Ok(Box::new(Scounteren::new(value))),
+        // Supervisor config
+        encoding::CSR_SENVCFG => Ok(Box::new(Senvcfg::new(value))),
+        // Supervisor trap handling
+        encoding::CSR_SSCRATCH => Ok(Box::new(Sscratch::new(value))),
+        encoding::CSR_SEPC => Ok(Box::new(Sepc::new(value))),
+        encoding::CSR_SCAUSE => Ok(Box::new(Scause::new(value))),
+        encoding::CSR_STVAL => Ok(Box::new(Mtval::new(value))),
+        encoding::CSR_SIP => Ok(Box::new(Sip::new(value))),
+        // Supervisor Protection and Translation
+        encoding::CSR_SATP => Ok(Box::new(Satp::new(value))),
+        // Hypervisor Trap Setup
+        encoding::CSR_HSTATUS => Ok(Box::new(Hstatus::new(value))),
+        encoding::CSR_HEDELEG => Ok(Box::new(Hedeleg::new(value))),
+        encoding::CSR_HIDELEG => Ok(Box::new(Hideleg::new(value))),
+        encoding::CSR_HIE => todo!("Add hie format"),
+        encoding::CSR_HCOUNTEREN => Ok(Box::new(Hcounteren::new(value))),
+        encoding::CSR_HGEIE => todo!("Add hgeie format"),
+        // Hypervisor Trap Handling
+        encoding::CSR_HTVAL => todo!("Add htval format"),
+        encoding::CSR_HIP => todo!("Add hip format"),
+        encoding::CSR_HVIP => todo!("Add hvip format"),
+        encoding::CSR_HTINST => todo!("Add htinst format"),
+        encoding::CSR_HGEIP => todo!("Add hgeip format"),
+        // Hypervisor configuration
+        encoding::CSR_HENVCFG => Ok(Box::new(Henvcfg::new(value))),
+        // Hypervisor Protection and Translation
+        encoding::CSR_HGATP => Ok(Box::new(Hgatp::new(value))),
+        // Hypervisor Counter/Timer Virtualization Registers
+        encoding::CSR_HTIMEDELTA => todo!("Add htimedelta format"),
+        // Virtual Supervisor Registers
+        encoding::CSR_VSSTATUS => Ok(Box::new(Sstatus::new(value))),
+        encoding::CSR_VSIE => todo!("Add vsie format"),
+        encoding::CSR_VSTVEC => Ok(Box::new(Stvec::new(value))),
+        encoding::CSR_VSSCRATCH => Ok(Box::new(Sscratch::new(value))),
+        encoding::CSR_VSEPC => Ok(Box::new(Sepc::new(value))),
+        encoding::CSR_VSCAUSE => Ok(Box::new(Scause::new(value))),
+        encoding::CSR_VSTVAL => todo!("Add vstval format"),
+        encoding::CSR_VSIP => todo!("Add vsip format"),
+        encoding::CSR_VSATP => Ok(Box::new(Satp::new(value))),
+        // Machine Information Registers
+        encoding::CSR_MVENDORID => Ok(Box::new(Mvendorid::new(value))),
+        encoding::CSR_MARCHID => Ok(Box::new(Marchid::new(value))),
+        encoding::CSR_MIMPID => Ok(Box::new(Mimpid::new(value))),
+        encoding::CSR_MHARTID => Ok(Box::new(Mhartid::new(value))),
+        // Machine Trap Setup
+        encoding::CSR_MSTATUS => Ok(Box::new(Mstatus::new(value))),
+        encoding::CSR_MISA => Ok(Box::new(Misa::new(value))),
+        encoding::CSR_MEDELEG => Ok(Box::new(Medeleg::new(value))),
+        encoding::CSR_MIDELEG => Ok(Box::new(Mideleg::new(value))),
+        encoding::CSR_MIE => Ok(Box::new(Mie::new(value))),
+        encoding::CSR_MTVEC => Ok(Box::new(Mtvec::new(value))),
+        encoding::CSR_MCOUNTEREN => todo!("Add mcounteren format"),
+        // Machine Trap Handling
+        encoding::CSR_MSCRATCH => todo!("Add mscratch format"),
+        encoding::CSR_MEPC => todo!("Add mepc format"),
+        encoding::CSR_MCAUSE => todo!("Add mcause format"),
+        encoding::CSR_MTVAL => Ok(Box::new(Mtval::new(value))),
+        encoding::CSR_MIP => Ok(Box::new(Mip::new(value))),
+        encoding::CSR_MTINST => todo!("Add mtinst format"),
+        encoding::CSR_MTVAL2 => Ok(Box::new(Mtval2::new(value))),
+        // Machine Configuration
+        encoding::CSR_MENVCFG => todo!("Add machine environment config format"),
+        encoding::CSR_MSECCFG => todo!("Add machine security config format"),
+        // Physical memory protection
+        encoding::CSR_PMPADDR0..=encoding::CSR_PMPADDR63 => Ok(Box::new(PmpAddr::new(value))),
+        encoding::CSR_PMPCFG0..=encoding::CSR_PMPCFG15 => Ok(Box::new(PmpCfg::new(value))),
+        // Unkown CSR
+        _ => Err(CsrError::UnkownAddr(address)),
+    }
 }
