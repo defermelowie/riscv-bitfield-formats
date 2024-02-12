@@ -242,7 +242,7 @@ where
 }
 
 /// Bitfield types only differ in the format they are printed
-trait BitFieldType {
+pub(crate) trait BitFieldType {
     fn decode(value: u64, size: usize) -> String;
 }
 

@@ -25,23 +25,6 @@ struct Cli {
 fn main() -> ! {
     let cli = Cli::parse();
 
-    // Try to format as instruction
-    if let "ins" | "inst" | "instr" = cli.name.as_str() {
-        match inst::format_instr(cli.value) {
-            Ok(i) => {
-                print!("{}", i);
-                exit(0)
-            }
-            Err(e) => {
-                // Output error if instruction formatting failed
-                eprint!("\x1b[31m\x1b[1m");
-                eprintln!("Formatting failed: {}", e);
-                eprint!("\x1b[0m");
-                exit(-1)
-            }
-        }
-    }
-
     // Try instruction related formats
     let inst = inst::format(&cli.name, cli.value);
     if let Ok(i) = inst {
@@ -66,6 +49,7 @@ fn main() -> ! {
     // Output error if formatting failed
     eprint!("\x1b[31m\x1b[1m");
     eprintln!("Formatting failed:");
+    eprintln!("\t- {}", inst.err().unwrap());
     eprintln!("\t- {}", csr.err().unwrap());
     eprintln!("\t- {}", vmem.err().unwrap());
     eprint!("\x1b[0m");

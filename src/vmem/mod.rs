@@ -17,7 +17,7 @@ pub use pte::*;
 /// Errors that may arise when creating/handling a CSR
 #[derive(Error, Debug)]
 pub enum VmemError {
-    #[error("\"{0}\" is not a name of a supported virtual memory related format")]
+    #[error("\"{0}\" is not recognized as a virtual memory related format")]
     Unknown(String),
 }
 
